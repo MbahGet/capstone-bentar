@@ -55,7 +55,7 @@ Bertanggung jawab atas ML core dan API Agent 2. Tidak mengerjakan UI.
 
 Bertanggung jawab atas ML core dan API Agent 3. Tidak mengerjakan UI.
 
-- [x] Siapkan dummy dataset: log produksi, data defect, data downtime
+- [ ] Siapkan dummy dataset: log produksi, data defect, data downtime
 - [ ] Implementasi preprocessing: merge by timestamp, handle missing values, normalisasi
 - [ ] Implementasi correlation analysis: Pearson, Spearman, chi-square test
 - [ ] Train XGBoost → hitung SHAP value dengan TreeExplainer
