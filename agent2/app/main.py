@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from io import StringIO
 from pathlib import Path
 from typing import AsyncIterator
+from pydantic import BaseModel
 
 # ── make sure the app/ folder is always on sys.path ──────────────────────────
 APP_DIR = Path(__file__).resolve().parent
@@ -25,6 +26,11 @@ TRAINING_DATA_PATH = BASE_DIR / "data" / "production_daily_dummy.csv"
 
 model = DeviationModel()
 model_train_info = {}
+
+
+class QueryRequest(BaseModel):
+    query: str
+    sessionId: str | None = None
 
 
 def ensure_model_trained() -> None:
@@ -50,6 +56,49 @@ app = FastAPI(
 )
 
 
+@app.post("/query")
+async def query_agent(request: QueryRequest):
+    if not TRAINING_DATA_PATH.exists():
+        raise HTTPException(status_code=404, detail="Data CSV tidak ditemukan")
+
+    df = pd.read_csv(TRAINING_DATA_PATH)
+
+    try:
+        ensure_model_trained()
+        df_kpi = calculate_kpis(df)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    summary = summarize_kpis(df_kpi)
+    alerts = evaluate_thresholds(summary)
+
+    try:
+        df_pred, model_metrics = model.predict_deviation(df_kpi)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    top_deviations = top_deviation_rows(df_pred, top_n=5)
+
+    reasoning_payload = {
+        "summary": summary,
+        "alerts": alerts,
+        "model_metrics": model_metrics,
+        "top_deviations": top_deviations,
+    }
+    recommendation = generate_recommendation(reasoning_payload)
+
+    return {
+        "summary": summary,
+        "alerts": alerts,
+        "model_metrics": model_metrics,
+        "top_deviations": top_deviations,
+        "recommendation": recommendation,
+        "query": request.query,
+    }
+
+
 def _read_csv_upload(file: UploadFile, raw_bytes: bytes) -> pd.DataFrame:
     if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are accepted.")
@@ -58,7 +107,9 @@ def _read_csv_upload(file: UploadFile, raw_bytes: bytes) -> pd.DataFrame:
         csv_text = raw_bytes.decode("utf-8-sig")
         df = pd.read_csv(StringIO(csv_text))
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=400, detail=f"Failed to parse CSV: {exc}") from exc
+        raise HTTPException(
+            status_code=400, detail=f"Failed to parse CSV: {exc}"
+        ) from exc
 
     if df.empty:
         raise HTTPException(status_code=400, detail="CSV is empty.")

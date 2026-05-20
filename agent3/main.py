@@ -6,6 +6,7 @@ import shutil
 import json
 from typing import Optional
 import uvicorn
+from pydantic import BaseModel
 
 # Import custom modules
 from preprocessing import DataPreprocessor
@@ -24,6 +25,10 @@ app = FastAPI(
 RESULTS_DIR = Path("data/results")
 RESULTS_DIR.mkdir(exist_ok=True)
 
+class RCAQueryRequest(BaseModel):
+    query: str
+    sessionId: str | None = None
+
 @app.get("/")
 async def root():
     """Health check endpoint"""
@@ -32,6 +37,60 @@ async def root():
         "service": "Root Cause Analysis Agent",
         "version": "1.0.0"
     }
+
+@app.post("/query")
+async def query_rca(request: RCAQueryRequest):
+    """
+    Endpoint khusus untuk dipanggil oleh Agent 1 (n8n).
+    Membaca data lokal dan menjalankan full RCA pipeline.
+    """
+    try:
+        data_dir = Path("data")
+        
+        # 1. Validasi keberadaan file lokal
+        prod_path = data_dir / "production_log.csv"
+        defect_path = data_dir / "defect_data.csv"
+        downtime_path = data_dir / "downtime_log.csv"
+        
+        if not prod_path.exists():
+            raise HTTPException(status_code=404, detail="Sample data CSV tidak ditemukan di folder data/")
+
+        # 2. Jalankan Pipeline (Sama dengan logic /analyze lu)
+        # Step 1: Preprocessing
+        preprocessor = DataPreprocessor(str(prod_path), str(defect_path), str(downtime_path))
+        merged_df = preprocessor.preprocess()
+        
+        # Step 3: SHAP Analysis (Kita skip Step 2 biar cepet buat AI response)
+        merged_path = data_dir / "merged_dataset.csv"
+        preprocessor.save_processed_data(str(merged_path))
+        
+        shap_analyzer = SHAPAnalyzer(str(merged_path))
+        shap_analyzer.load_and_prepare_data()
+        shap_analyzer.train_xgboost()
+        shap_analyzer.calculate_shap_values()
+        feature_importance = shap_analyzer.rank_features_by_shap()
+        
+        # Step 4: LLM Explanation
+        explainer = LLMExplainer(str(data_dir / "shap_ranking.json"))
+        # (Asumsi shap_analyzer.save_results sudah dipanggil di pipeline lu)
+        shap_analyzer.save_results(feature_importance, str(data_dir))
+        
+        explainer.load_shap_ranking()
+        explanation = explainer.generate_explanation()
+        
+        # 3. Balikin hasil terstruktur
+        return {
+            "status": "success",
+            "rca_analysis": explanation,
+            "top_features": feature_importance.head(5).to_dict(orient='records'),
+            "metadata": {
+                "records_analyzed": len(merged_df),
+                "query_context": request.query
+            }
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RCA Query failed: {str(e)}")
 
 @app.post("/analyze")
 async def analyze_rca(

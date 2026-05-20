@@ -1,0 +1,61 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: "6334"
+
+  agent1:
+    image: n8nio/n8n:latest
+    container_name: agent1
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+    volumes:
+      - ./agent1/n8n_data:/home/node/.n8n
+    depends_on:
+      - qdrant
+      - agent2
+      - agent3
+
+  agent2:
+    build:
+      context: ./agent2
+      dockerfile: Dockerfile
+    container_name: agent2
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./agent2/data:/app/data
+    environment:
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      - qdrant
+
+  agent3:
+    build:
+      context: ./agent3
+      dockerfile: Dockerfile
+    container_name: agent3
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./agent3/data:/app/data
+    environment:
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      - qdrant
+
+volumes:
+  qdrant_storage:
+  n8n_data:
