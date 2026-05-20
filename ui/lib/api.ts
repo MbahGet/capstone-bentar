@@ -1,0 +1,85 @@
+import { KPIResult, RCAResult } from './types';
+
+export async function sendChat(query: string): Promise<{ response: string; agents_called: string[]; sources: string[] }> {
+  const res = await fetch('/api/agent1/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  if (!res.ok) throw new Error('Chat request failed');
+  return res.json();
+}
+
+export async function uploadPDF(file: File): Promise<{ success: boolean; message?: string }> {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch('/api/agent1/upload', {
+    method: 'POST',
+    body: fd,
+  });
+  if (!res.ok) throw new Error('PDF upload failed');
+  return res.json();
+}
+
+export async function analyzeKPI(file: File): Promise<KPIResult> {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch('/api/agent2/analyze', {
+    method: 'POST',
+    body: fd,
+  });
+  if (!res.ok) throw new Error('KPI analysis failed');
+  return res.json();
+}
+
+export async function analyzeRCA(
+  productionLog: File,
+  defectData: File,
+  downtimeLog: File
+): Promise<RCAResult> {
+  const fd = new FormData();
+  fd.append('production_log', productionLog);
+  fd.append('defect_data', defectData);
+  fd.append('downtime_log', downtimeLog);
+  const res = await fetch('/api/agent3/analyze', {
+    method: 'POST',
+    body: fd,
+  });
+  if (!res.ok) throw new Error('RCA analysis failed');
+  return res.json();
+}
+
+export async function checkHealth(agent: 'agent1' | 'agent2' | 'agent3'): Promise<{
+  status: string;
+  latency: number;
+  data?: Record<string, unknown>;
+  error?: string;
+}> {
+  const start = Date.now();
+  try {
+    const res = await fetch(`/api/${agent}/health`, {
+      signal: AbortSignal.timeout(6000),
+      cache: 'no-store',
+    });
+    const latency = Date.now() - start;
+    const data = await res.json();
+    return { status: res.ok ? 'online' : 'offline', latency, data };
+  } catch {
+    return { status: 'offline', latency: Date.now() - start, error: 'Connection failed' };
+  }
+}
+
+export function writeActivityLog(entry: {
+  agent: string;
+  method: string;
+  endpoint: string;
+  statusCode: number | null;
+  latency: number | null;
+  error?: string;
+}) {
+  try {
+    const logs = JSON.parse(localStorage.getItem('bentar_logs') || '[]');
+    logs.unshift({ ...entry, id: Date.now().toString(), timestamp: new Date().toISOString() });
+    localStorage.setItem('bentar_logs', JSON.stringify(logs.slice(0, 100)));
+  } catch { /* localStorage may not be available */ }
+}

@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #0f1629;
+  --color-bg-card: #141c2e;
+  --color-bg-hover: #1a2540;
+  --color-bd: #1e2d4a;
+  --color-bd-light: #2d4275;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #0a0e1a;
+  --foreground: #e2e8f0;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  height: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0f1629;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e2d4a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2d4275;
+}
+
+/* Typing dots */
+@keyframes bounce-dot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Pipeline flow animation */
+@keyframes dash-flow {
+  to { stroke-dashoffset: -20; }
+}
+
+/* Fade in slide */
+@keyframes fade-slide {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Status glow */
+@keyframes glow-green {
+  0%, 100% { box-shadow: 0 0 4px #10b981; }
+  50% { box-shadow: 0 0 12px #10b981, 0 0 20px #10b98144; }
+}
+@keyframes glow-red {
+  0%, 100% { box-shadow: 0 0 4px #ef4444; }
+  50% { box-shadow: 0 0 12px #ef4444; }
+}
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-bounce-dot { animation: bounce-dot 0.8s ease-in-out infinite; }
+.animate-dash-flow { animation: dash-flow 1s linear infinite; }
+.animate-fade-slide { animation: fade-slide 0.2s ease-out; }
+.animate-glow-green { animation: glow-green 2s ease-in-out infinite; }
+.animate-glow-red { animation: glow-red 2s ease-in-out infinite; }
+.animate-dot-pulse { animation: dot-pulse 2s ease-in-out infinite; }
