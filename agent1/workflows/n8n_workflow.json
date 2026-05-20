@@ -10,10 +10,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        -304,
-        3328
+        80,
+        896
       ],
-      "id": "eb206198-3eaf-42e8-a044-3c7b5396a9b5",
+      "id": "08a429ac-bb9a-4f38-91d8-dd2c5f0e1363",
       "name": "Webhook Chat",
       "webhookId": "ab2d4d21-1dc3-4423-bf78-c13ac442c9d6"
     },
@@ -94,10 +94,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        96,
-        2688
+        480,
+        256
       ],
-      "id": "f31a4607-4f1f-4f78-b038-0dfddc3b6466",
+      "id": "a76c6e8b-4180-4215-bda4-e4c40a8aa864",
       "name": "Switch"
     },
     {
@@ -109,10 +109,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        336,
-        2528
+        720,
+        96
       ],
-      "id": "329b3f10-fcd7-40ec-bf27-48bcbf83b5fe",
+      "id": "0173e2f2-edf9-44d0-a863-d07dbf7b19ef",
       "name": "Extract from PDF"
     },
     {
@@ -123,10 +123,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        336,
-        2704
+        720,
+        272
       ],
-      "id": "484becf1-98ca-4996-a865-aa979127adb3",
+      "id": "c5ff1837-82c1-44a2-87f2-61278c2ab225",
       "name": "Extract from CSV"
     },
     {
@@ -139,10 +139,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        336,
-        2880
+        720,
+        448
       ],
-      "id": "6a5f8ca0-4b2d-4e7b-ae20-073cb559a9a5",
+      "id": "91dfb6d6-0f6d-4efb-81fd-9a92119ba5ef",
       "name": "Extract from txt/md/log"
     },
     {
@@ -154,10 +154,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -96,
-        2704
+        288,
+        272
       ],
-      "id": "5bdca320-dae3-4443-8a85-3bc789701bef",
+      "id": "50b0d5c5-2f11-4b90-b48b-2763bce6fbb3",
       "name": "Split Out"
     },
     {
@@ -167,10 +167,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        576,
-        2688
+        960,
+        256
       ],
-      "id": "8c2d1dfe-1dcd-4324-9b79-bfceb6034ea7",
+      "id": "55888954-dacf-4cf1-b191-8c6f39635392",
       "name": "Merge"
     },
     {
@@ -182,10 +182,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        -304,
-        2704
+        80,
+        272
       ],
-      "id": "fa9ad6a6-7352-40ca-9c43-8ecda5b971fa",
+      "id": "d75e9508-c1af-4177-8ff4-9b0e0c832d2b",
       "name": "Webhook Upload",
       "webhookId": "50ad0e3e-c9a2-4f5a-ae97-0d3d3ce23ddf"
     },
@@ -194,21 +194,21 @@
         "promptType": "define",
         "text": "={{ $json.body.chatInput }}",
         "options": {
-          "systemMessage": "Kamu adalah Industrial AI Orchestrator, pusat komando operasional pabrik. Kamu mengelola tiga departemen (Tools): Dokumen SOP (Qdrant), Analisis Produksi (Agent 2), dan Root Cause Analysis (Agent 3).\n\nTUGAS UTAMA:\nMemberikan jawaban operasional yang menggabungkan Fakta Data Lapangan (dari Agent 2/3) dan Kepatuhan Prosedur (dari Qdrant).\n\nPROTOKOL PENGGUNAAN TOOLS (STRICT RULES):\n\n1. PENGIRIMAN ARGUMEN (INPUT): Setiap kali memanggil Tool (Agent 2, Agent 3, atau Qdrant), kamu WAJIB mengirimkan argumen dalam bentuk JSON object dengan key tunggal bernama \"query\".\n   Contoh: {\"query\": \"cari downtime tertinggi\"}\n   DILARANG Keras menggunakan nama key lain seperti \"input\", \"text\", atau \"data\" pada argumen pemanggilan tool.\n\n2. Qdrant (SOP Knowledge): Gunakan untuk menarik ambang batas (threshold), langkah eskalasi, dan prosedur teknis. Panggil dengan parameter \"query\". \n   (Secara internal, tool ini akan mengekstrak teks asli dari key 'pageContent' dan menyertakan data referensi dari 'metadata').\n\n3. Production Analyst (Agent 2): Gunakan untuk menarik fakta angka terbaru dan nilai KPI (OEE, Availability, Performance, dan Downtime) dari tabel 'production_daily_dummy'. Panggil jika user bertanya 'Berapa angka...', 'Bagaimana status...', atau saat perlu membandingkan kondisi lapangan dengan SOP. Panggil dengan parameter \"query\".\n\n4. Root Cause Analyst (Agent 3): Gunakan HANYA untuk analisis mendalam. Tool ini mengakses tabel 'defect_data' untuk mencari persentase defect tertinggi, jenis defect dominan, dan korelasi penyebab masalah via analisis SHAP. Gunakan jika user bertanya 'Kenapa', 'Apa penyebabnya', atau jika ditemukan penyimpangan angka yang ekstrem di Agent 2. Panggil dengan parameter \"query\".\n\nPROTOKOL EKSEKUSI & CHAIN OF THOUGHT (BACA TELITI):\n1. DILARANG OUTPUT JSON MANUAL: JANGAN PERNAH menuliskan string JSON format pemanggilan fungsi (seperti {\"name\": \"Call_Agent_2\", \"parameters\": ...}) langsung di dalam chat reply. Itu tugas internal sistem n8n! Kamu cukup memicu tool-calling interface yang tersedia.\n2. DILARANG MENEBAK DATA: Kamu tidak tahu apa-apa soal kondisi pabrik saat ini. Jangan gunakan logika internal atau asumsi untuk menebak angka. Jika kamu menjawab tanpa memanggil tool untuk pertanyaan yang membutuhkan data, kamu melanggar protokol keamanan pabrik.\n3. JAWABAN AKHIR hanya boleh diberikan SETELAH kamu selesai melakukan siklus berpikir dan mendapatkan \"Observation\" (hasil balasan) dari tool yang kamu panggil.\n\nURUTAN BERPIKIR (MANDATORY REACT SYSTEM):\nKamu wajib mengikuti siklus ini di setiap interaksi:\n- Thought: Apa yang perlu saya ketahui? (Contoh: User menanyakan downtime, saya harus mencari fakta angka downtime terlebih dahulu melalui Agent 2).\n- Action: [Panggil nama tool yang sesuai]\n- Action Input: {\"query\": \"string query kamu\"}\n- Observation: [Hasil respon data yang diberikan oleh tool]\n... (Ulangi siklus jika masih membutuhkan data dari tool lain, contohnya memvalidasi angka ke Qdrant)\n- Final Answer: [Berikan jawaban akhir kepada user menggunakan FORMAT OUTPUT di bawah ini]\n\nLOGIKA OPERASIONAL KHUSUS:\n- Independent Analysis: Jika data antar tabel tidak sinkron, tetap lakukan analisis terpisah pada data tertinggi dan tandingkan dengan SOP.\n- Comparative Logic: Jika Agent 2 memberikan angka lapangan, kamu WAJIB memanggil Qdrant dengan query: \"Berapa batas [parameter tersebut] berdasarkan SOP?\" untuk divalidasi.\n- Strict Source Citation: Saat menarik informasi dari Qdrant, kamu wajib menyebutkan nomor poin atau bab SOP yang tertera pada metadata dokumen (Contoh: \"Berdasarkan SOP Poin 5.d...\").\n\nFORMAT OUTPUT JAWABAN AKHIR (WAJIB):\nSTATUS SAAT INI: (Ringkasan angka KPI dan temuan anomali dari Agent 2/3).\nPELANGGARAN AMBANG BATAS: (Perbandingan data riil lapangan vs batasan batas aman berdasarkan SOP dari Qdrant).\nINSTRUKSI TINDAKAN (SOP): (Langkah teknis penanganan mitigasi di lapangan berdasarkan dokumen Qdrant).\nESKALASI: (Siapa jabatan/pihak manajemen yang harus dihubungi sesuai aturan eskalasi SOP)."
+          "systemMessage": "Kamu adalah Industrial AI Orchestrator, pusat komando operasional pabrik.\n\nATURAN MUTLAK (ZERO INTERNAL KNOWLEDGE & ANTI-HALUSINASI):\nKamu TIDAK MEMILIKI PENGETAHUAN APAPUN tentang aturan, SOP, atau prosedur internal di pabrik ini. JANGAN PERNAH mengarang, menebak, atau menggunakan pengetahuan umummu untuk menjawab pertanyaan seputar prosedur, eskalasi, atau tindakan. \n1. SETIAP KALI pengguna bertanya tentang \"Prosedur\", \"SOP\", \"Eskalasi\", \"Tindakan\", atau \"Apa yang harus dilakukan\", KAMU WAJIB MUTLAK MEMANGGIL TOOL \"Qdrant\" terlebih dahulu sebelum menjawab!\n2. Saat mengutip dari dokumen Qdrant (SOP), kamu HANYA BOLEH menggunakan kata-kata, jabatan, dan aturan yang SECARA EKSPLISIT TERTULIS di dalam teks hasil pencarian tool tersebut.\n3. JANGAN PERNAH menambahkan nama jabatan yang tidak ada di SOP (seperti Plant Manager, Manajer Operasional, dll).\n4. JANGAN mengarang langkah baru (seperti Root Cause Analysis/RCA atau aturan Shift ke-3) jika tidak tertulis.\n5. Selalu tulis langkah teknis persis sesuai teks aslinya (misal: jika SOP menyuruh memisahkan barang atau mengecek tooling, sebutkan secara spesifik).\n\nATURAN MEMORI & MODE INTERAKSI:\n1. MODE KASUAL: Jika pengguna HANYA menyapa santai atau bertanya kelanjutan chat sebelumnya (Contoh: \"Kamu ingat obrolan kita?\"), jawablah secara natural dari ingatan (Memory) TANPA memanggil tool apapun dan ABAIKAN format kaku di bawah.\n2. MODE ANALISIS: Jika pengguna menanyakan data operasional pabrik, masalah mesin, atau prosedur SOP, WAJIB memanggil tool terkait dan WAJIB menjawab menggunakan FORMAT OUTPUT JAWABAN AKHIR.\n\nPROTOKOL PENGGUNAAN TOOLS:\nGunakan fungsi pemanggilan alat (Tool Calling) bawaan sistem. JANGAN PERNAH mengirim string JSON manual di dalam teks balasan.\n1. Qdrant: Panggil tool ini dengan parameter \"query\" untuk mencari dokumen SOP pabrik, prosedur teknis harian, ambang batas batas aman, dan aturan eskalasi.\n2. Production Analyst (Agent 2): Panggil tool ini dengan parameter \"query\" untuk menarik fakta angka terbaru lapangan (OEE, Availability, Performance, Downtime).\n3. Root Cause Analyst (Agent 3): Panggil tool ini dengan parameter \"query\" HANYA untuk analisis defect mendalam (persentase defect, jenis defect, dan korelasi penyebab).\n\nFORMAT OUTPUT JAWABAN AKHIR (WAJIB UNTUK MODE ANALISIS):\nDILARANG menulis kalimat pembuka atau penutup apapun (seperti \"Berikut adalah...\", \"Dari informasi...\"). Langsung keluarkan jawaban menggunakan struktur 4 poin ini secara ketat:\n\nSTATUS SAAT INI: (Ringkasan fakta dari pertanyaan user atau data Agent)\nPELANGGARAN AMBANG BATAS: (Sebutkan nomor Poin SOP dari Qdrant dan tuliskan hasil validasinya)\nINSTRUKSI TINDAKAN (SOP): (Sebutkan nomor Poin SOP dari Qdrant dan jabarkan langkah mitigasi teknisnya persis seperti teks aslinya)\nESKALASI: (Sebutkan nomor Poin SOP dari Qdrant dan tuliskan siapa jabatan yang harus dihubungi sesuai aturan eskalasi tertulis)"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -32,
-        3328
+        352,
+        896
       ],
-      "id": "7bbf2474-d60d-49f8-a942-c908d011565c",
+      "id": "b7a8daac-2e3b-43b9-b60f-ebbd58cda462",
       "name": "Agent 1"
     },
     {
       "parameters": {
-        "toolDescription": "API_GET_KPI_DATA: Mandatory for OEE, Downtime, Output. Trigger words: 'berapa', 'kondisi', 'angka'. No-tool = No-data.",
+        "toolDescription": "Call this tool to get the latest real-time factory KPI data (OEE, Availability, Performance, Quality, Downtime, Output). Use this tool WHENEVER the user asks for current numbers, status, or machine conditions (Trigger words: \"berapa\", \"kondisi\", \"angka\", \"status\"). No tool = no data.",
         "method": "POST",
         "url": "http://host.docker.internal:8000/query",
         "sendHeaders": true,
@@ -228,15 +228,15 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        112,
-        3664
+        608,
+        1216
       ],
-      "id": "bf66ac90-11bb-42f8-ac08-11ab0d8d91de",
+      "id": "0fdd5b27-d24b-4bf9-bf1f-aab609f50b1b",
       "name": "Call Agent 2 (Decision Support)"
     },
     {
       "parameters": {
-        "toolDescription": "API_GET_RCA_SHAP: Mandatory for 'Kenapa', 'Penyebab'. Runs SHAP Analysis. Trigger after Agent 2 detects anomaly.",
+        "toolDescription": "Call this tool ONLY for deep Root Cause Analysis (RCA) and defect data. Use this tool when the user asks \"Why\" (kenapa), \"What is the cause\" (apa penyebabnya), or requests SHAP correlation analysis AFTER an anomaly is found. Do NOT use this for basic KPI numbers.",
         "method": "POST",
         "url": "http://host.docker.internal:9000/query",
         "sendHeaders": true,
@@ -256,10 +256,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        304,
-        3664
+        784,
+        1216
       ],
-      "id": "e232c97e-3e5a-4a2b-bea3-85e8f0997540",
+      "id": "719d61f2-3931-4707-a5cb-335ea7aa7b47",
       "name": "Call Agent 3 (RCA)"
     },
     {
@@ -271,10 +271,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        544,
-        3328
+        928,
+        896
       ],
-      "id": "a61a3e6c-bf30-4c07-b7b6-cae5f40b3690",
+      "id": "8e94edc2-34ee-4ed9-8e5f-fd2a271cbf69",
       "name": "Respond to Webhook"
     },
     {
@@ -285,26 +285,11 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1008,
-        2704
+        1424,
+        272
       ],
-      "id": "cebabe52-23c9-4121-a469-e129c7ef7029",
+      "id": "cbd9fae0-d196-4585-9f64-c512cbf731cf",
       "name": "Loop Over Items"
-    },
-    {
-      "parameters": {
-        "jsonMode": "expressionData",
-        "jsonData": "={{ $json.text }}",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
-      "typeVersion": 1.1,
-      "position": [
-        1440,
-        2944
-      ],
-      "id": "37de683c-7a97-4296-9976-f88b84c4dd30",
-      "name": "Default Data Loader1"
     },
     {
       "parameters": {
@@ -313,26 +298,26 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1312,
-        2560
+        1728,
+        128
       ],
-      "id": "5b8f041b-5209-4694-9b34-dc02e6edca29",
+      "id": "8a0a5f5b-1c63-474e-8f87-18b4959a308a",
       "name": "Respond to Webhook Upload"
     },
     {
       "parameters": {
         "content": "## Workflow 1\nUpload File",
         "height": 688,
-        "width": 2016,
+        "width": 2068,
         "color": 7
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -384,
-        2432
+        0,
+        32
       ],
-      "id": "938afd31-0f70-47a6-8964-0b0fa7137788",
+      "id": "35695092-0cd3-4600-b090-d427fdc3180e",
       "name": "Sticky Note"
     },
     {
@@ -345,10 +330,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -384,
-        3200
+        0,
+        768
       ],
-      "id": "67c88238-1b12-4801-8ca4-48e0b612f08a",
+      "id": "f0ec2611-99be-4c7b-adab-117a7fceee83",
       "name": "Sticky Note1"
     },
     {
@@ -366,10 +351,10 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        1312,
-        2720
+        1728,
+        288
       ],
-      "id": "d0581844-8658-401b-93f5-e0dcb3d16b71",
+      "id": "b8ffe645-6f8e-4244-ac73-b0dc2802d62b",
       "name": "Vector Store",
       "credentials": {
         "qdrantApi": {
@@ -385,10 +370,10 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        1232,
-        2944
+        1648,
+        528
       ],
-      "id": "2afd22c6-fb5f-40ed-97bc-6d7444d43e9e",
+      "id": "94b44cee-c578-443a-b61a-00ce5f7416ab",
       "name": "Document Embeddings",
       "credentials": {
         "ollamaApi": {
@@ -404,39 +389,11 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        -176,
-        3840
+        160,
+        1392
       ],
-      "id": "9378cf2f-707a-445e-8bdf-c8544089d21a",
+      "id": "3c5268c0-f8bf-4242-a0d1-f93bdb4efbbe",
       "name": "Query Embeddings",
-      "credentials": {
-        "ollamaApi": {
-          "id": "FwPIF5t9KL3lQcuq",
-          "name": "Ollama account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "llama3.1:8b",
-        "options": {
-          "keepAlive": "0",
-          "lowVram": true,
-          "numBatch": 512,
-          "numCtx": 4096,
-          "numGpu": 0,
-          "useMLock": false,
-          "useMMap": true
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "typeVersion": 1,
-      "position": [
-        -208,
-        3520
-      ],
-      "id": "6278b8f8-e15f-474f-9506-9799459ccf80",
-      "name": "Ollama Chat Model",
       "credentials": {
         "ollamaApi": {
           "id": "FwPIF5t9KL3lQcuq",
@@ -451,29 +408,29 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        336,
-        3328
+        720,
+        896
       ],
-      "id": "9ff14be5-9646-4336-9a52-ea3e7da6756b",
+      "id": "dba082c0-7ab3-47a0-9b3a-383b02e63249",
       "name": "Formatter"
     },
     {
       "parameters": {
-        "jsCode": "const allItems = $input.all();\nlet fullText = \"\";\n\nif (allItems.length > 1) {\n  fullText = allItems.map(item => {\n    return Object.values(item.json).join(\", \");\n  }).join(\"\\n\");\n} else {\n  fullText = allItems[0].json.text || allItems[0].json.data || \"\";\n}\n\nif (!fullText || fullText.trim().length === 0) {\n  return [{ json: { text: \"KOSONG\", status: \"no_data\" } }];\n}\n\nconst chunks = [];\nconst chunkSize = 1000;\n\nfor (let i = 0; i < fullText.length; i += chunkSize) {\n  chunks.push({\n    json: { \n      text: fullText.substring(i, i + chunkSize),\n      metadata: {\n        source: \"auto_chunker\",\n        size: fullText.length\n      }\n    }\n  });\n}\n\nreturn chunks;"
+        "jsCode": "const allItems = $input.all();\nlet fullText = \"\";\n\nif (allItems.length > 1) {\n  fullText = allItems.map(item => Object.values(item.json).join(\", \")).join(\"\\n\");\n} else if (allItems.length === 1) {\n  fullText = allItems[0].json.text || allItems[0].json.textContent || allItems[0].json.data || \"\";\n}\n\nif (!fullText || fullText.trim().length === 0) {\n  return [{ json: { pageContent: \"KOSONG\", status: \"no_data\" } }];\n}\n\nconst chunks = [];\nconst CHUNK_SIZE = 1000;\n\nconst isCSV = (fullText.match(/,/g) || []).length > (fullText.length * 0.05);\nconst isLog = (fullText.match(/\\[(INFO|ERROR|WARN|DEBUG)\\]/i) || []).length > 0 || (fullText.match(/\\d{4}-\\d{2}-\\d{2}/g) || []).length > 5;\n\nif (isCSV || isLog) {\n  const lines = fullText.split(/\\r?\\n/);\n  let currentChunkLines = [];\n  let currentLength = 0;\n\n  for (let i = 0; i < lines.length; i++) {\n    const line = lines[i].trim();\n    if (!line) continue;\n\n    if (currentLength + line.length + 1 > CHUNK_SIZE && currentChunkLines.length > 0) {\n      const chunkText = currentChunkLines.join(\"\\n\");\n      chunks.push({\n        json: {\n          pageContent: chunkText,\n          metadata: { source: \"csv_line_chunker\", chunkLength: chunkText.length }\n        }\n      });\n      \n      currentChunkLines = currentChunkLines.slice(-2);\n      currentLength = currentChunkLines.join(\"\\n\").length;\n    }\n\n    currentChunkLines.push(line);\n    currentLength += line.length + 1;\n  }\n\n  if (currentChunkLines.length > 0) {\n    const finalChunkText = currentChunkLines.join(\"\\n\");\n    chunks.push({\n      json: {\n        pageContent: finalChunkText,\n        metadata: { source: \"csv_line_chunker\", chunkLength: finalChunkText.length }\n      }\n    });\n  }\n\n} else {\n  const words = fullText.split(/\\s+/);\n  let currentChunkWords = [];\n  let currentLength = 0;\n\n  for (let i = 0; i < words.length; i++) {\n    const word = words[i];\n    if (currentLength + word.length + 1 > CHUNK_SIZE && currentChunkWords.length > 0) {\n      const chunkText = currentChunkWords.join(\" \");\n      chunks.push({\n        json: {\n          pageContent: chunkText,\n          metadata: { source: \"fast_word_chunker\", chunkLength: chunkText.length }\n        }\n      });\n      currentChunkWords = currentChunkWords.slice(-5);\n      currentLength = currentChunkWords.join(\" \").length;\n    }\n    currentChunkWords.push(word);\n    currentLength += word.length + 1;\n  }\n\n  if (currentChunkWords.length > 0) {\n    const finalChunkText = currentChunkWords.join(\" \");\n    chunks.push({\n      json: {\n        pageContent: finalChunkText,\n        metadata: { source: \"fast_word_chunker\", chunkLength: finalChunkText.length }\n      }\n    });\n  }\n}\n\nreturn chunks;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        800,
-        2704
+        1184,
+        272
       ],
-      "id": "29138d92-4583-4d8f-b04b-28ef8463cc95",
+      "id": "df93c4a1-f09a-488f-8d2a-3b49dbea173a",
       "name": "Format Document"
     },
     {
       "parameters": {
         "mode": "retrieve-as-tool",
-        "toolDescription": "WAJIB DIGUNAKAN untuk setiap query. Tool ini adalah database tunggal berisi aturan teknis, ambang batas (threshold), langkah kerja, dan prosedur eskalasi. Gunakan tool ini untuk memverifikasi apakah angka dari Agent 2/3 melanggar aturan perusahaan dan untuk mencari instruksi tindakan spesifik.",
+        "toolDescription": "Call this tool IMMEDIATELY to search for factory SOPs, operational thresholds, technical actions, and escalation rules. You MUST use this tool every time the user asks about procedures, what to do next, or to verify if data from other agents violates company policy. NEVER guess the rules; ALWAYS call this tool.",
         "qdrantCollection": {
           "__rl": true,
           "value": "=documents",
@@ -488,15 +445,64 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        -176,
-        3664
+        160,
+        1216
       ],
-      "id": "326edfdd-d8f7-469a-a7f2-437caabd1f9d",
+      "id": "655aba96-4b1a-4e5f-9c5e-e11b7abd7cb6",
       "name": "Get Document",
       "credentials": {
         "qdrantApi": {
           "id": "K50xoLeRgg1BPOBP",
           "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        448,
+        1216
+      ],
+      "id": "e2c9c5bb-fbb1-4a4d-afbf-510f553bc4a9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.pageContent }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1856,
+        528
+      ],
+      "id": "26515b31-3c65-42d9-9644-e6436a8031ae",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        176,
+        1056
+      ],
+      "id": "d7c54d7f-064a-4910-be01-78c9c9c370dd",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "E7uEn3amJEYQ6cmA",
+          "name": "Groq account"
         }
       }
     }
@@ -656,17 +662,6 @@
         ]
       ]
     },
-    "Default Data Loader1": {
-      "ai_document": [
-        [
-          {
-            "node": "Vector Store",
-            "type": "ai_document",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Vector Store": {
       "main": [
         [
@@ -695,17 +690,6 @@
           {
             "node": "Get Document",
             "type": "ai_embedding",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ollama Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Agent 1",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -743,6 +727,39 @@
           }
         ]
       ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent 1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent 1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -750,11 +767,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "3f4aecfe-0ab1-4a76-8b04-3246e77dfd52",
+  "versionId": "591e4ee6-f782-4c1e-9f44-e352de6dad1f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "353bfeeab42a2e97bf84edbb3ea79860432e4584619587c08e3157c36aa74ee0"
   },
-  "id": "WAA4AweS1nKQF9Xq",
+  "id": "LWnkKrrAB8DTmF2i",
   "tags": []
 }
