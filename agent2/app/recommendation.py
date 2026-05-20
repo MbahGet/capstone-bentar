@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-import requests
 from typing import Any, Dict, List
 
 from settings import get_settings
@@ -31,7 +29,7 @@ def _fallback_recommendation(payload: Dict[str, Any]) -> str:
         )
 
     return (
-        "Rekomendasi otomatis (fallback):\n"
+        "Rekomendasi otomatis:\n"
         f"- Ringkasan KPI: OEE {summary.get('avg_oee')}%, "
         f"Downtime {summary.get('avg_downtime_rate')}%, "
         f"Defect {summary.get('avg_defect_rate')}%\n"
@@ -41,16 +39,6 @@ def _fallback_recommendation(payload: Dict[str, Any]) -> str:
 
 def generate_recommendation(payload: Dict[str, Any]) -> Dict[str, Any]:
     settings = get_settings()
-    api_key = settings.ollama_api_key
-    base_url = settings.ollama_base_url
-    model_name = settings.ollama_model
-
-    if not api_key or not base_url:
-        return {
-            "source": "fallback",
-            "model": None,
-            "text": _fallback_recommendation(payload),
-        }
 
     prompt = (
         "Anda adalah AI industrial operations advisor. "
@@ -64,48 +52,36 @@ def generate_recommendation(payload: Dict[str, Any]) -> Dict[str, Any]:
         f"Top deviation: {len(payload.get('top_deviations', []))} item(s)"
     )
 
-    try:
-        # Call Ollama via HTTP requests using /api/generate endpoint
-        url = f"{base_url}/api/generate"
+    # --- Groq (primary) ---
+    if settings.groq_api_key:
+        try:
+            from openai import OpenAI
 
-        payload_request = {"model": model_name, "prompt": prompt, "stream": False}
-
-        print(f"[Recommendation] Calling Ollama at {url}")
-        print(f"[Recommendation] Prompt length: {len(prompt)} chars")
-        response = requests.post(url, json=payload_request, timeout=180)
-
-        if response.status_code != 200:
-            print(
-                f"[Recommendation] Ollama returned {response.status_code}: {response.text[:200]}"
+            client = OpenAI(
+                api_key=settings.groq_api_key,
+                base_url=settings.groq_base_url,
             )
-            return {
-                "source": "fallback",
-                "model": None,
-                "text": _fallback_recommendation(payload),
-                "error": f"Ollama returned {response.status_code}",
-            }
+            response = client.chat.completions.create(
+                model=settings.groq_model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Kamu adalah AI industrial operations advisor yang ahli dalam manufaktur.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.3,
+                max_tokens=512,
+            )
+            text = response.choices[0].message.content
+            print(f"[Recommendation] Groq call OK ({settings.groq_model})")
+            return {"source": "groq", "model": settings.groq_model, "text": text}
+        except Exception as exc:
+            print(f"[Recommendation] Groq failed: {exc} — falling back to rule-based")
 
-        result = response.json()
-        text = result.get("response", _fallback_recommendation(payload))
-
-        return {
-            "source": "ollama",
-            "model": model_name,
-            "text": text,
-        }
-    except requests.exceptions.ConnectionError:
-        print(f"Warning: Cannot connect to Ollama at {base_url}")
-        return {
-            "source": "fallback",
-            "model": None,
-            "text": _fallback_recommendation(payload),
-            "error": f"Ollama connection failed at {base_url}",
-        }
-    except Exception as exc:  # noqa: BLE001
-        print(f"Warning: Error calling Ollama: {exc}")
-        return {
-            "source": "fallback",
-            "model": None,
-            "text": _fallback_recommendation(payload),
-            "error": str(exc),
-        }
+    # --- Fallback: rule-based ---
+    return {
+        "source": "fallback",
+        "model": None,
+        "text": _fallback_recommendation(payload),
+    }

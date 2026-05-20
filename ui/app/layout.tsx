@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BENTAR — Manufacturing AI Platform",
-  description: "Intelligent manufacturing decision support system",
+  title: "FactoryOps Copilot",
+  description: "Manufacturing AI Platform — KPI Analysis, Root Cause Analysis, & Production Intelligence",
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, LayoutDashboard, MonitorCheck } from 'lucide-react';
+import { Factory, LayoutDashboard, MonitorCheck } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -12,11 +12,11 @@ export default function Navbar() {
       {/* Logo */}
       <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-          <Activity size={16} className="text-white" />
+          <Factory size={16} className="text-white" />
         </div>
         <div className="leading-none">
-          <div className="text-white font-bold text-base tracking-widest">BENTAR</div>
-          <div className="text-[#475569] text-[10px] tracking-wide uppercase">Manufacturing AI</div>
+          <div className="text-white font-bold text-sm tracking-wide">FactoryOps Copilot</div>
+          <div className="text-[#475569] text-[10px] tracking-wide uppercase">Manufacturing AI Platform</div>
         </div>
       </div>
 

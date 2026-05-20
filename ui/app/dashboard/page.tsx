@@ -15,7 +15,6 @@ import {
   BarChart3,
   GitBranch,
   X,
-  ChevronDown,
   Info,
   Layers,
 } from 'lucide-react';
@@ -24,7 +23,7 @@ const WELCOME: Message = {
   id: 'welcome',
   role: 'assistant',
   content:
-    'Selamat datang di Konsultan AI BENTAR. Saya dapat membantu Anda menganalisis data produksi, OEE, downtime, defect rate, dan melakukan analisis akar masalah (RCA).\n\nUpload dokumen PDF (SOP, manual, laporan QC) untuk referensi, atau ajukan pertanyaan langsung.',
+    'Selamat datang di FactoryOps Copilot. Saya dapat membantu menganalisis data produksi, OEE, downtime, defect rate, dan melakukan analisis akar masalah (RCA).\n\nUpload dokumen PDF (SOP, manual, laporan QC) untuk referensi, atau ajukan pertanyaan langsung.',
   timestamp: new Date(),
   agentsCalled: [],
 };
