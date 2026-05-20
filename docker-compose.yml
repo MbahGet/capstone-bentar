@@ -60,6 +60,25 @@ services:
     depends_on:
       - qdrant
 
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: ui
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      # Di dalam Docker network, agent diakses lewat nama service, bukan localhost
+      AGENT1_URL: http://agent1:5678
+      AGENT2_URL: http://agent2:8000
+      AGENT3_URL: http://agent3:9000
+    depends_on:
+      - agent1
+      - agent2
+      - agent3
+
 volumes:
   qdrant_storage:
   n8n_data:

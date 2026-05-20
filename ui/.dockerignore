@@ -1,0 +1,28 @@
+# Build artifacts
+.next
+out
+
+# Dependencies (di-install ulang saat build)
+node_modules
+
+# Dev environment files — jangan masuk image
+.env.local
+.env.*.local
+
+# Misc
+.git
+.gitignore
+*.md
+README.md
+CLAUDE.md
+AGENTS.md
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
