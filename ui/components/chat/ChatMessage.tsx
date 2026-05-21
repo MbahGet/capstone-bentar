@@ -1,5 +1,10 @@
+'use client';
+
+import React from 'react';
 import { Message } from '@/lib/types';
-import { Bot, User, AlertCircle } from 'lucide-react';
+import { Bot, User, AlertCircle, FileText } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const AGENT_LABELS: Record<string, { label: string; color: string }> = {
   agent2: { label: 'KPI Analyst', color: 'text-violet-400 bg-violet-500/10 border-violet-500/30' },
@@ -30,6 +35,107 @@ function TypingIndicator() {
   );
 }
 
+/* ─── Markdown prose renderer ─────────────────────────────────────────────── */
+function MarkdownContent({ content }: { content: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        /* Headings */
+        h1: ({ children }) => (
+          <h1 className="text-base font-bold text-white mt-3 mb-1.5 first:mt-0">{children}</h1>
+        ),
+        h2: ({ children }) => (
+          <h2 className="text-sm font-bold text-slate-100 mt-3 mb-1.5 first:mt-0 border-b border-[#1e2d4a] pb-1">{children}</h2>
+        ),
+        h3: ({ children }) => (
+          <h3 className="text-sm font-semibold text-slate-200 mt-2.5 mb-1 first:mt-0">{children}</h3>
+        ),
+
+        /* Paragraphs */
+        p: ({ children }) => (
+          <p className="text-sm text-slate-200 leading-relaxed mb-2 last:mb-0">{children}</p>
+        ),
+
+        /* Bold & Italic */
+        strong: ({ children }) => (
+          <strong className="font-semibold text-white">{children}</strong>
+        ),
+        em: ({ children }) => (
+          <em className="italic text-slate-300">{children}</em>
+        ),
+
+        /* Lists */
+        ul: ({ children }) => (
+          <ul className="my-2 ml-4 space-y-0.5 list-none">{children}</ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="my-2 ml-4 space-y-0.5 list-decimal list-inside">{children}</ol>
+        ),
+        li: ({ children }) => (
+          <li className="text-sm text-slate-200 leading-relaxed flex gap-2 items-start">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400/60 shrink-0" />
+            <span>{children}</span>
+          </li>
+        ),
+
+        /* Code — react-markdown v10: no inline prop, detect via className */
+        code: ({ className, children }: React.ComponentPropsWithoutRef<'code'>) => {
+          const isBlock = className?.startsWith('language-');
+          return isBlock ? (
+            <code className={`block bg-[#0a0e1a] border border-[#1e2d4a] text-emerald-300 rounded-lg p-3 text-xs font-mono overflow-x-auto whitespace-pre my-2 ${className ?? ''}`}>
+              {children}
+            </code>
+          ) : (
+            <code className="bg-[#0a0e1a] border border-[#1e2d4a] text-blue-300 rounded px-1.5 py-0.5 text-xs font-mono">
+              {children}
+            </code>
+          );
+        },
+
+        /* Code blocks */
+        pre: ({ children }) => (
+          <pre className="my-2 rounded-lg overflow-hidden">{children}</pre>
+        ),
+
+        /* Blockquote */
+        blockquote: ({ children }) => (
+          <blockquote className="my-2 pl-3 border-l-2 border-blue-500/50 text-slate-400 italic text-sm">
+            {children}
+          </blockquote>
+        ),
+
+        /* Horizontal rule */
+        hr: () => <hr className="my-3 border-[#1e2d4a]" />,
+
+        /* Table */
+        table: ({ children }) => (
+          <div className="my-2 overflow-x-auto rounded-lg border border-[#1e2d4a]">
+            <table className="w-full text-xs">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className="bg-[#0a0e1a] text-slate-400 uppercase tracking-wide">{children}</thead>
+        ),
+        tbody: ({ children }) => <tbody className="divide-y divide-[#1e2d4a]">{children}</tbody>,
+        tr: ({ children }) => <tr className="hover:bg-[#0a0e1a]/50 transition-colors">{children}</tr>,
+        th: ({ children }) => <th className="px-3 py-2 text-left font-medium">{children}</th>,
+        td: ({ children }) => <td className="px-3 py-2 text-slate-300">{children}</td>,
+
+        /* Links */
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+            {children}
+          </a>
+        ),
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+}
+
+/* ─── Main component ─────────────────────────────────────────────────────── */
 export default function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === 'user';
 
@@ -51,7 +157,7 @@ export default function ChatMessage({ message }: { message: Message }) {
 
   return (
     <div className="flex justify-start animate-fade-slide">
-      <div className="max-w-[82%] flex flex-col items-start gap-1.5">
+      <div className="max-w-[85%] flex flex-col items-start gap-1.5">
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <Bot size={13} className="text-blue-400" />
           <span>Konsultan AI</span>
@@ -60,7 +166,7 @@ export default function ChatMessage({ message }: { message: Message }) {
         </div>
 
         <div
-          className={`rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed ${
+          className={`rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed w-full ${
             message.isError
               ? 'bg-red-500/10 border border-red-500/30 text-red-300'
               : 'bg-[#141c2e] border border-[#1e2d4a] text-slate-200'
@@ -74,8 +180,7 @@ export default function ChatMessage({ message }: { message: Message }) {
               <span>{message.content}</span>
             </div>
           ) : (
-            /* Truncate long responses — full version in modal */
-            <p className="whitespace-pre-wrap line-clamp-6">{message.content}</p>
+            <MarkdownContent content={message.content} />
           )}
         </div>
 
@@ -85,8 +190,9 @@ export default function ChatMessage({ message }: { message: Message }) {
               <AgentBadge key={a} agent={a} />
             ))}
             {(message.sources ?? []).length > 0 && (
-              <span className="text-xs text-slate-600">
-                {message.sources!.length} dokumen direferensikan
+              <span className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <FileText size={11} />
+                {message.sources!.length} dokumen
               </span>
             )}
           </div>

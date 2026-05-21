@@ -83,3 +83,16 @@ body {
 .animate-glow-green { animation: glow-green 2s ease-in-out infinite; }
 .animate-glow-red { animation: glow-red 2s ease-in-out infinite; }
 .animate-dot-pulse { animation: dot-pulse 2s ease-in-out infinite; }
+
+/* Smooth scroll */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Markdown prose: ol li shouldn't double-render bullet */
+.chat-prose ol > li {
+  display: list-item;
+}
+.chat-prose ul > li > span:first-child {
+  flex-shrink: 0;
+}

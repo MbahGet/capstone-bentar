@@ -139,7 +139,6 @@ export default function DashboardPage() {
       };
 
       setMessages((prev) => prev.map((m) => (m.id === loadId ? assistantMsg : m)));
-      setModal({ type: 'chat', message: assistantMsg, query: content });
 
       historyBuf.current.push({
         role: 'assistant',
@@ -174,10 +173,10 @@ export default function DashboardPage() {
 
   /* ─── Render ──────────────────────────────────────────────────────────── */
   return (
-    <div className="flex h-[calc(100vh-64px)]">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
 
       {/* ── LEFT: History sidebar ── */}
-      <aside className="w-60 shrink-0 flex flex-col border-r border-[#1e2d4a] bg-[#0f1629] overflow-hidden">
+      <aside className="w-64 shrink-0 flex flex-col border-r border-[#1e2d4a] bg-[#0a0e1a] overflow-hidden">
 
         {/* Confirmation banner — shown when there's a previous-day chat to archive */}
         {pendingArchive && (
@@ -224,7 +223,7 @@ export default function DashboardPage() {
       </aside>
 
       {/* ── CENTER: Chat ── */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 min-h-0">
         <ChatWindow
           messages={messages}
           onSend={handleSend}

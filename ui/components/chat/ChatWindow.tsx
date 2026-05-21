@@ -19,16 +19,17 @@ export default function ChatWindow({ messages, onSend, isLoading }: Props) {
   }, [messages]);
 
   return (
-    <div className="flex flex-col flex-1 min-w-0">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+    <div className="flex flex-col h-full min-h-0">
+      {/* Messages — grows, scrolls internally from top to bottom (newest at bottom) */}
+      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 flex flex-col gap-5">
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} />
         ))}
-        <div ref={bottomRef} />
+        {/* Anchor at bottom so new messages auto-scroll into view */}
+        <div ref={bottomRef} className="shrink-0 h-0" />
       </div>
 
-      {/* Input */}
+      {/* Input — pinned to bottom */}
       <ChatInput onSend={onSend} disabled={isLoading} />
     </div>
   );
