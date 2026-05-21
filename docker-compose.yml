@@ -20,7 +20,7 @@ services:
       - N8N_HOST=0.0.0.0
       - N8N_PORT=5678
     volumes:
-      - ./agent1/n8n_data:/home/node/.n8n
+      - n8n_data:/home/node/.n8n
     depends_on:
       - qdrant
       - agent2

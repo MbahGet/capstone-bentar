@@ -1,10 +1,18 @@
 import { KPIResult, RCAResult } from './types';
 
+let _sessionId: string | null = null;
+function getSessionId(): string {
+  if (!_sessionId) {
+    _sessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+  return _sessionId;
+}
+
 export async function sendChat(query: string): Promise<{ response: string; agents_called: string[]; sources: string[] }> {
   const res = await fetch('/api/agent1/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ chatInput: query, sessionId: getSessionId() }),
   });
   if (!res.ok) throw new Error('Chat request failed');
   return res.json();

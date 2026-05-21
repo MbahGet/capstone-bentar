@@ -267,7 +267,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\n  \"reply\": \"={{ $json.output }}\",\n  \"sessionId\": \"={{ $node['Webhook Chat'].json.body.sessionId }}\"\n}",
+        "responseBody": "={{ JSON.stringify({ reply: $json.data.reply || $json.output, sessionId: $node['Webhook Chat'].json.body.sessionId }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.respondToWebhook",

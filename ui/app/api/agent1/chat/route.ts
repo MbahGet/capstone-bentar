@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     // Normalise n8n's "reply" field → "response"
     const normalised = {
-      response: (raw.reply ?? raw.response ?? raw.output ?? 'Tidak ada respons.') as string,
+      response: (raw.reply || raw.response || raw.output || 'Tidak ada respons.') as string,
       agents_called: (raw.agents_called ?? []) as string[],
       sources: (raw.sources ?? []) as string[],
     };
