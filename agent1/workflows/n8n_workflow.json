@@ -11,10 +11,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        512,
-        592
+        80,
+        864
       ],
-      "id": "3a28e249-d26e-49ac-874f-daf874a782fd",
+      "id": "e842e069-a454-427b-b75f-9998366ef1eb",
       "name": "Webhook Chat",
       "webhookId": "ab2d4d21-1dc3-4423-bf78-c13ac442c9d6"
     },
@@ -95,10 +95,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        912,
-        -48
+        480,
+        224
       ],
-      "id": "4edbc9a3-4aff-4577-98f9-27a889db54d7",
+      "id": "195f2836-ad89-4890-9678-c925743c729b",
       "name": "Switch"
     },
     {
@@ -110,10 +110,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        1152,
-        -208
+        720,
+        64
       ],
-      "id": "d961f67f-4381-4cc4-8e1d-7b9e8879fbb6",
+      "id": "0470f0f2-96fd-4e3b-9ec7-b48b237100e9",
       "name": "Extract from PDF"
     },
     {
@@ -124,10 +124,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        1152,
-        -32
+        720,
+        240
       ],
-      "id": "15152ac8-bc70-403e-af92-cbf3b30d86f9",
+      "id": "d7e32cff-3379-4bd2-ad84-8f9356b60532",
       "name": "Extract from CSV"
     },
     {
@@ -140,10 +140,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        1152,
-        144
+        720,
+        416
       ],
-      "id": "b7503b30-cc4f-418d-b08a-8307a4ccdaa9",
+      "id": "9f9d7832-a1b9-4164-b5af-8bb8960840a1",
       "name": "Extract from txt/md/log"
     },
     {
@@ -155,10 +155,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        720,
-        -32
+        288,
+        240
       ],
-      "id": "d388bcaa-5ed8-4775-af80-9aa0e9de9d94",
+      "id": "32faba36-a695-4ba8-9a12-b8dd3fc3a5b9",
       "name": "Split Out"
     },
     {
@@ -168,10 +168,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        1392,
-        -48
+        960,
+        224
       ],
-      "id": "77c1909f-811b-46e8-82a5-cced6c5b2804",
+      "id": "9bd9d6ae-5e20-4da5-bf62-29918bd85bb1",
       "name": "Merge"
     },
     {
@@ -184,10 +184,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        512,
-        -32
+        80,
+        240
       ],
-      "id": "52b486b3-308a-4e9b-893c-18442ee1e999",
+      "id": "186541df-afe5-4575-b2ab-c4375b0defb2",
       "name": "Webhook Upload",
       "webhookId": "50ad0e3e-c9a2-4f5a-ae97-0d3d3ce23ddf"
     },
@@ -196,16 +196,16 @@
         "promptType": "define",
         "text": "={{ $json.body.chatInput }}",
         "options": {
-          "systemMessage": "Kamu adalah Industrial AI Orchestrator, pusat komando operasional pabrik.\n\nATURAN MUTLAK (ZERO INTERNAL KNOWLEDGE & ANTI-HALUSINASI):\nKamu TIDAK MEMILIKI PENGETAHUAN APAPUN tentang aturan, SOP, atau prosedur internal di pabrik ini. JANGAN PERNAH mengarang, menebak, atau menggunakan pengetahuan umummu untuk menjawab pertanyaan seputar prosedur, eskalasi, atau tindakan. \n1. SETIAP KALI pengguna bertanya tentang \"Prosedur\", \"SOP\", \"Eskalasi\", \"Tindakan\", atau \"Apa yang harus dilakukan\", KAMU WAJIB MUTLAK MEMANGGIL TOOL \"Qdrant\" terlebih dahulu sebelum menjawab!\n2. Saat mengutip dari dokumen Qdrant (SOP), kamu HANYA BOLEH menggunakan kata-kata, jabatan, dan aturan yang SECARA EKSPLISIT TERTULIS di dalam teks hasil pencarian tool tersebut.\n3. JANGAN PERNAH menambahkan nama jabatan yang tidak ada di SOP (seperti Plant Manager, Manajer Operasional, dll).\n4. JANGAN mengarang langkah baru (seperti Root Cause Analysis/RCA atau aturan Shift ke-3) jika tidak tertulis.\n5. Selalu tulis langkah teknis persis sesuai teks aslinya (misal: jika SOP menyuruh memisahkan barang atau mengecek tooling, sebutkan secara spesifik).\n\nATURAN MEMORI & MODE INTERAKSI:\n1. MODE KASUAL: Jika pengguna HANYA menyapa santai atau bertanya kelanjutan chat sebelumnya (Contoh: \"Kamu ingat obrolan kita?\"), jawablah secara natural dari ingatan (Memory) TANPA memanggil tool apapun dan ABAIKAN format kaku di bawah.\n2. MODE ANALISIS: Jika pengguna menanyakan data operasional pabrik, masalah mesin, atau prosedur SOP, WAJIB memanggil tool terkait dan WAJIB menjawab menggunakan FORMAT OUTPUT JAWABAN AKHIR.\n\nPROTOKOL PENGGUNAAN TOOLS:\nGunakan fungsi pemanggilan alat (Tool Calling) bawaan sistem. JANGAN PERNAH mengirim string JSON manual di dalam teks balasan.\n1. Qdrant: Panggil tool ini dengan parameter \"query\" untuk mencari dokumen SOP pabrik, prosedur teknis harian, ambang batas batas aman, dan aturan eskalasi.\n2. Production Analyst (Agent 2): Panggil tool ini dengan parameter \"query\" untuk menarik fakta angka terbaru lapangan (OEE, Availability, Performance, Downtime).\n3. Root Cause Analyst (Agent 3): Panggil tool ini dengan parameter \"query\" HANYA untuk analisis defect mendalam (persentase defect, jenis defect, dan korelasi penyebab).\n\nFORMAT OUTPUT JAWABAN AKHIR (WAJIB UNTUK MODE ANALISIS):\nDILARANG menulis kalimat pembuka atau penutup apapun (seperti \"Berikut adalah...\", \"Dari informasi...\"). Langsung keluarkan jawaban menggunakan struktur 4 poin ini secara ketat:\n\nSTATUS SAAT INI: (Ringkasan fakta dari pertanyaan user atau data Agent)\nPELANGGARAN AMBANG BATAS: (Sebutkan nomor Poin SOP dari Qdrant dan tuliskan hasil validasinya)\nINSTRUKSI TINDAKAN (SOP): (Sebutkan nomor Poin SOP dari Qdrant dan jabarkan langkah mitigasi teknisnya persis seperti teks aslinya)\nESKALASI: (Sebutkan nomor Poin SOP dari Qdrant dan tuliskan siapa jabatan yang harus dihubungi sesuai aturan eskalasi tertulis)"
+          "systemMessage": "Kamu adalah Industrial AI Orchestrator, pusat komando operasional pabrik.\n\nATURAN MUTLAK (ZERO INTERNAL KNOWLEDGE & ANTI-HALUSINASI):\nKamu TIDAK MEMILIKI PENGETAHUAN APAPUN tentang aturan, SOP, atau prosedur internal di pabrik ini. JANGAN PERNAH mengarang, menebak, atau menggunakan pengetahuan umummu untuk menjawab pertanyaan seputar prosedur, eskalasi, atau tindakan.\n1. SETIAP KALI pengguna bertanya tentang \"Prosedur\", \"SOP\", \"Eskalasi\", \"Tindakan\", atau \"Apa yang harus dilakukan\", KAMU WAJIB MUTLAK MEMANGGIL TOOL \"Qdrant\" terlebih dahulu sebelum menjawab!\n2. Saat mengutip dari dokumen Qdrant (SOP), kamu HANYA BOLEH menggunakan kata-kata, jabatan, dan aturan yang SECARA EKSPLISIT TERTULIS di dalam teks hasil pencarian tool tersebut.\n3. JANGAN PERNAH menambahkan nama jabatan yang tidak ada di SOP.\n4. Jangan mengarang langkah baru jika tidak tertulis di SOP.\n5. Selalu tulis langkah teknis persis sesuai teks aslinya.\n\nPROTOKOL PENGGUNAAN TOOLS:\nGunakan fungsi pemanggilan alat (Tool Calling) bawaan sistem. JANGAN PERNAH mengirim string JSON manual di dalam teks balasan.\n1. Qdrant: Mencari dokumen SOP pabrik, prosedur teknis harian, ambang batas aman, dan aturan eskalasi.\n2. Production Analyst (Agent 2): Menarik fakta angka terbaru lapangan (OEE, Availability, Performance, Downtime).\n3. Root Cause Analyst (Agent 3): HANYA untuk analisis defect mendalam (persentase defect, jenis defect, dan korelasi penyebab).\n\n---\n[LOGIKA PEMILIHAN FORMAT JAWABAN]\nSebelum menulis jawaban, evaluasi dengan teliti maksud pertanyaan pengguna:\n\nKONDISI A (HANYA MEMBACA / MENANYAKAN DEFINISI TEKS SOP):\nGunakan kondisi ini JIKA DAN HANYA JIKA pengguna meminta membaca dokumen secara umum, meminta menampilkan isi pasal/judul SOP, atau menanyakan definisi statis teks TANPA menyebutkan situasi masalah/angka spesifik.\n(Contoh: \"coba baca Tujuan dari sop\", \"tampilkan SOP eskalasi\", \"apa isi poin 7?\")\n- JANGAN GUNAKAN format 4 poin di bawah.\n- DILARANG menuliskan \"STATUS SAAT INI\", \"PELANGGARAN AMBANG BATAS\", dll.\n- JAWAB LANGSUNG: Tuliskan teks isi SOP secara to-the-point, rapi, dan bersih.\n\nKONDISI B (ANALISIS SITUASI, KONDISI LAPANGAN, ATAU AMBANG BATAS):\nGunakan kondisi ini JIKA pengguna menanyakan data operasional (seperti kalimat \"hasil agent 2\"), menanyakan kondisi mesin saat ini, ATAU menyebutkan suatu situasi/kondisi/angka spesifik untuk divalidasi tindakan dan eskalasinya berdasarkan SOP.\n- KAMU WAJIB MENGGUNAKAN FORMAT OUTPUT JAWABAN AKHIR di bawah ini secara ketat.\n\n---\n[PANDUAN GAYA PENULISAN & ESTETIKA (BEAUTIFY)]\n- DILARANG menuliskan variabel mentah seperti `avg_oee = 92.12%`. Ubah menjadi bahasa manusia yang rapi: **Average OEE:** 92.12%.\n- Gunakan **Bolding** pada metrik penting, angka, nama jabatan, atau status operasional.\n- Gunakan *Line Break* (baris baru) dan *Sub-bullet points* (`-` atau `*`) jika di dalam satu poin terdapat lebih dari dua metrik atau daftar tindakan. Jangan menggabungkan semuanya dalam satu paragraf panjang.\n\n---\nFORMAT OUTPUT JAWABAN AKHIR (WAJIB HANYA UNTUK KONDISI B):\nDILARANG menulis kalimat pembuka atau penutup apapun. Langsung keluarkan struktur 4 poin ini secara ketat dengan gaya penulisan yang rapi (beautified):\n\n1. **STATUS SAAT INI**\n   [Jabarkan metrik dari Agent/Kondisi Lapangan menggunakan baris baru dan sub-bullet. Contoh:]\n   - **Average OEE:** 92.12%\n   - **Average Downtime Rate:** 18.66%\n   - **Average Defect Rate:** 3.66%\n\n2. **PELANGGARAN AMBANG BATAS**\n   [Tuliskan hasil analisis komparasi dengan bahasa yang bersih. Contoh:]\n   - **Status:** Tidak terdeteksi adanya pelanggaran ambang batas SOP.\n   - **Analisis:** Defect rate (3.66%) masih di bawah batas maksimal SOP (5.00%).\n\n3. **INSTRUKSI TINDAKAN (SOP)**\n   [Tuliskan nomor Poin SOP dan breakdown daftar tindakannya dengan baris baru agar scannable. Contoh:]\n   Berdasarkan **Poin 2** SOP, Operator dan Supervisor wajib memantau metrik berikut di akhir shift:\n   - a. Downtime mesin (menit)\n   - b. Total output produksi\n   - c. Good output & defect output\n   - d. OEE, Availability, Performance, Quality\n\n4. **ESKALASI**\n   - **Status:** Tidak diperlukan eskalasi (Kondisi Operasional Aman)."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        784,
-        592
+        352,
+        864
       ],
-      "id": "31b31fd7-7fc6-412e-8530-7d7b9ffddc42",
+      "id": "3db36cb0-20ad-4299-96e7-5ccf7176e653",
       "name": "Agent 1"
     },
     {
@@ -230,10 +230,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        1040,
-        912
+        608,
+        1184
       ],
-      "id": "84c6a28f-81ca-492e-99f1-1657328cb130",
+      "id": "d8e05f90-8ab0-4f9a-a855-c3f10239b33e",
       "name": "Call Agent 2 (Decision Support)"
     },
     {
@@ -258,10 +258,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        1216,
-        912
+        784,
+        1184
       ],
-      "id": "8c6aaf8f-b00f-4055-bf77-6267f89fc83e",
+      "id": "06bc2ae5-b2a2-49af-8689-2d7725258672",
       "name": "Call Agent 3 (RCA)"
     },
     {
@@ -273,10 +273,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1360,
-        592
+        928,
+        864
       ],
-      "id": "d35fd9f2-a12b-4fc4-ae06-f9ce78a2bc5d",
+      "id": "790945ce-13ce-4bc4-967c-e44e3cebe8bb",
       "name": "Respond to Webhook"
     },
     {
@@ -287,10 +287,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1856,
-        -32
+        1424,
+        240
       ],
-      "id": "37e608b9-c79e-4d6d-b8f6-48e7191b2dde",
+      "id": "a49f4390-2ec5-4d3e-aebf-7b9edd4547e3",
       "name": "Loop Over Items"
     },
     {
@@ -300,10 +300,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        2160,
-        -176
+        1728,
+        96
       ],
-      "id": "64240efe-b849-4625-aee0-a597bb2e37cb",
+      "id": "6f187488-1d32-4ad9-88f8-013509576740",
       "name": "Respond to Webhook Upload"
     },
     {
@@ -316,10 +316,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        432,
-        -272
+        0,
+        0
       ],
-      "id": "cf0dc3c1-58f6-4807-8266-4cb514b612a1",
+      "id": "98a156ef-4c20-4bec-a73d-e9f6b02793be",
       "name": "Sticky Note"
     },
     {
@@ -332,10 +332,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        432,
-        464
+        0,
+        736
       ],
-      "id": "9100c064-6d54-4c00-8b4b-26a8f0e5c90e",
+      "id": "9cf62838-423e-493e-815f-56ee898e288f",
       "name": "Sticky Note1"
     },
     {
@@ -353,14 +353,14 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        2160,
-        -16
+        1728,
+        256
       ],
-      "id": "40c44a09-cc35-4855-9c0a-7c90c1455c0c",
+      "id": "b6e103e6-6e3b-4982-a4fc-e7c45d52fbdb",
       "name": "Vector Store",
       "credentials": {
         "qdrantApi": {
-          "id": "K50xoLeRgg1BPOBP",
+          "id": "BIyIfPrQB8WAgwLl",
           "name": "Qdrant account"
         }
       }
@@ -372,14 +372,14 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        2080,
-        224
+        1648,
+        496
       ],
-      "id": "0878f60f-f7db-4b69-b16a-bce5c648a28b",
+      "id": "89c354cb-cbff-46ca-af56-e15f80fbedb4",
       "name": "Document Embeddings",
       "credentials": {
         "ollamaApi": {
-          "id": "FwPIF5t9KL3lQcuq",
+          "id": "u2OPWhvDt2m4iarI",
           "name": "Ollama account"
         }
       }
@@ -391,14 +391,14 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        592,
-        1088
+        160,
+        1360
       ],
-      "id": "bca0e3cb-8eeb-4c19-a69f-21ca2ae14264",
+      "id": "b4bc9524-77ad-4f4a-8dc3-ca1a222dbe90",
       "name": "Query Embeddings",
       "credentials": {
         "ollamaApi": {
-          "id": "FwPIF5t9KL3lQcuq",
+          "id": "u2OPWhvDt2m4iarI",
           "name": "Ollama account"
         }
       }
@@ -410,10 +410,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1152,
-        592
+        720,
+        864
       ],
-      "id": "b152db6d-42d2-488a-b400-fcebd4951950",
+      "id": "574fe722-070b-4f8f-b04d-f871c3b183d9",
       "name": "Formatter"
     },
     {
@@ -423,10 +423,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1616,
-        -32
+        1184,
+        240
       ],
-      "id": "aa935171-74f0-481d-89d9-623de19b6f8d",
+      "id": "d42e7cd1-b321-4495-809f-cbb22eb3f950",
       "name": "Format Document"
     },
     {
@@ -447,14 +447,14 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        592,
-        912
+        160,
+        1184
       ],
-      "id": "2c9dd61d-a517-4127-ab7e-2168659a0454",
+      "id": "b2fbcbc1-521a-4a4e-a250-0e4d6b92c131",
       "name": "Get Document",
       "credentials": {
         "qdrantApi": {
-          "id": "K50xoLeRgg1BPOBP",
+          "id": "BIyIfPrQB8WAgwLl",
           "name": "Qdrant account"
         }
       }
@@ -467,10 +467,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        880,
-        912
+        448,
+        1184
       ],
-      "id": "731fdb52-4985-4aba-9be2-36dfb74464bd",
+      "id": "c1ea6aaf-d331-4cd0-88e9-5f7a6d1e7888",
       "name": "Simple Memory"
     },
     {
@@ -482,28 +482,30 @@
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
       "position": [
-        2288,
-        224
+        1856,
+        496
       ],
-      "id": "c6159bd1-a8b9-4fff-bf92-8538e452ea17",
+      "id": "3de0862b-d30b-4ef3-ac63-f6bb03cbd4b9",
       "name": "Default Data Loader"
     },
     {
       "parameters": {
         "model": "openai/gpt-oss-120b",
-        "options": {}
+        "options": {
+          "temperature": 0.2
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        608,
-        752
+        176,
+        1024
       ],
-      "id": "2be4af1b-1f05-4cfe-816a-e7cea0dc73d8",
+      "id": "6a862533-0e14-48c5-907e-8f36d33b2e34",
       "name": "Groq Chat Model",
       "credentials": {
         "groqApi": {
-          "id": "E7uEn3amJEYQ6cmA",
+          "id": "a92q40fGiijwflyD",
           "name": "Groq account"
         }
       }
@@ -769,10 +771,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "2b1bcb13-bac6-4760-bebf-8614097d6e8b",
+  "versionId": "d1a811c1-b1d1-473c-9da0-bed8dede6890",
   "meta": {
-    "instanceId": "353bfeeab42a2e97bf84edbb3ea79860432e4584619587c08e3157c36aa74ee0"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "823e297856b31c26f7f9e01d7968f0f149726db759ccd89494403701d8949d6b"
   },
-  "id": "OKaMMiEDKosvm6By",
+  "id": "hUpfSDG48bDJoSoe",
   "tags": []
 }
