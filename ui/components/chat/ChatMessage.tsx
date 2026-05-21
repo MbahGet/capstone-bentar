@@ -4,13 +4,13 @@ import { Bot, User, AlertCircle } from 'lucide-react';
 const AGENT_LABELS: Record<string, { label: string; color: string }> = {
   agent2: { label: 'KPI Analyst', color: 'text-violet-400 bg-violet-500/10 border-violet-500/30' },
   agent3: { label: 'RCA Analyst', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  none: { label: 'Orchestrator', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
+  none:   { label: 'Orchestrator', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
 };
 
 function AgentBadge({ agent }: { agent: string }) {
   const info = AGENT_LABELS[agent] ?? { label: agent, color: 'text-slate-400 bg-slate-500/10 border-slate-500/30' };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${info.color}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border ${info.color}`}>
       {info.label}
     </span>
   );
@@ -18,11 +18,11 @@ function AgentBadge({ agent }: { agent: string }) {
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1 h-5">
-      {[0, 100, 200].map((delay) => (
+    <div className="flex items-center gap-1.5 h-6">
+      {[0, 120, 240].map((delay) => (
         <span
           key={delay}
-          className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce-dot"
+          className="w-2 h-2 rounded-full bg-blue-400 animate-bounce-dot"
           style={{ animationDelay: `${delay}ms` }}
         />
       ))}
@@ -36,12 +36,12 @@ export default function ChatMessage({ message }: { message: Message }) {
   if (isUser) {
     return (
       <div className="flex justify-end animate-fade-slide">
-        <div className="max-w-[72%] flex flex-col items-end gap-1">
-          <div className="flex items-center gap-2 text-[11px] text-slate-500">
+        <div className="max-w-[72%] flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
             <span>{message.timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
-            <User size={12} />
+            <User size={13} />
           </div>
-          <div className="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm leading-relaxed">
+          <div className="bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
             {message.content}
           </div>
         </div>
@@ -51,9 +51,9 @@ export default function ChatMessage({ message }: { message: Message }) {
 
   return (
     <div className="flex justify-start animate-fade-slide">
-      <div className="max-w-[80%] flex flex-col items-start gap-1">
-        <div className="flex items-center gap-2 text-[11px] text-slate-500">
-          <Bot size={12} className="text-blue-400" />
+      <div className="max-w-[82%] flex flex-col items-start gap-1.5">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <Bot size={13} className="text-blue-400" />
           <span>Konsultan AI</span>
           <span>·</span>
           <span>{message.timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -74,18 +74,18 @@ export default function ChatMessage({ message }: { message: Message }) {
               <span>{message.content}</span>
             </div>
           ) : (
-            <p className="whitespace-pre-wrap">{message.content}</p>
+            /* Truncate long responses — full version in modal */
+            <p className="whitespace-pre-wrap line-clamp-6">{message.content}</p>
           )}
         </div>
 
-        {/* Agent badges & sources */}
         {!message.isLoading && !message.isError && (
           <div className="flex flex-wrap gap-1.5 mt-0.5">
             {(message.agentsCalled ?? []).map((a) => (
               <AgentBadge key={a} agent={a} />
             ))}
             {(message.sources ?? []).length > 0 && (
-              <span className="text-[10px] text-slate-600 flex items-center gap-1">
+              <span className="text-xs text-slate-600">
                 {message.sources!.length} dokumen direferensikan
               </span>
             )}

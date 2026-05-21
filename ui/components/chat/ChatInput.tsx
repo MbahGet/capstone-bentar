@@ -17,7 +17,10 @@ export default function ChatInput({ onSend, disabled }: Props) {
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setText('');
-    ref.current?.focus();
+    if (ref.current) {
+      ref.current.style.height = 'auto';
+      ref.current.focus();
+    }
   }
 
   function handleKey(e: KeyboardEvent<HTMLTextAreaElement>) {
@@ -28,8 +31,10 @@ export default function ChatInput({ onSend, disabled }: Props) {
   }
 
   return (
-    <div className="p-4 border-t border-[#1e2d4a] bg-[#0f1629]">
-      <div className="flex items-end gap-3 bg-[#141c2e] border border-[#1e2d4a] rounded-xl px-4 py-3 focus-within:border-blue-600/60 transition-colors">
+    <div className="shrink-0 px-5 py-4 bg-[#0a0e1a] border-t border-[#1e2d4a]">
+      <div className="rounded-2xl overflow-hidden border border-[#1e2d4a] bg-[#141c2e] focus-within:border-blue-500/40 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.07)] transition-all duration-200">
+
+        {/* Textarea */}
         <textarea
           ref={ref}
           value={text}
@@ -37,30 +42,32 @@ export default function ChatInput({ onSend, disabled }: Props) {
           onKeyDown={handleKey}
           disabled={disabled}
           placeholder="Tanya tentang OEE, downtime, defect rate, atau minta analisis akar masalah..."
-          rows={1}
-          className="flex-1 bg-transparent text-sm text-slate-200 placeholder-slate-600 resize-none outline-none leading-relaxed max-h-32 overflow-y-auto"
-          style={{ minHeight: '24px' }}
+          rows={2}
+          className="w-full bg-transparent text-sm text-slate-200 placeholder:text-slate-600 resize-none outline-none px-4 pt-3.5 pb-2 leading-relaxed max-h-40 overflow-y-auto"
           onInput={(e) => {
             const el = e.currentTarget;
             el.style.height = 'auto';
-            el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+            el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
           }}
         />
-        <button
-          onClick={handleSend}
-          disabled={disabled || !text.trim()}
-          className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 transition-all hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {disabled ? (
-            <Loader2 size={14} className="text-white animate-spin" />
-          ) : (
-            <Send size={14} className="text-white" />
-          )}
-        </button>
+
+        {/* Footer: hint left · send button right */}
+        <div className="flex items-center justify-between px-4 pb-3 pt-1">
+          <span className="text-xs text-slate-700 select-none">
+            Enter kirim&nbsp;·&nbsp;Shift+Enter baris baru
+          </span>
+          <button
+            onClick={handleSend}
+            disabled={disabled || !text.trim()}
+            className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center hover:bg-blue-500 active:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm shadow-blue-500/20"
+          >
+            {disabled
+              ? <Loader2 size={13} className="text-white animate-spin" />
+              : <Send size={13} className="text-white" />
+            }
+          </button>
+        </div>
       </div>
-      <p className="text-[10px] text-slate-700 mt-2 text-center">
-        Enter untuk kirim · Shift+Enter untuk baris baru
-      </p>
     </div>
   );
 }

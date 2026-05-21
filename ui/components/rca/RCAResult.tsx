@@ -14,7 +14,7 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
           { label: 'Defect Rate', value: `${result.summary.defect_rate_percentage.toFixed(1)}%` },
         ].map(({ label, value }) => (
           <div key={label} className="bg-[#141c2e] border border-[#1e2d4a] rounded-xl px-3 py-2 text-center">
-            <div className="text-[10px] text-slate-600">{label}</div>
+            <div className="text-xs text-slate-600">{label}</div>
             <div className="text-sm font-bold text-slate-200 mt-0.5">{value}</div>
           </div>
         ))}
@@ -24,7 +24,7 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
       <div className="rounded-xl border border-[#1e2d4a] overflow-hidden">
         <div className="flex items-center gap-2 px-3 py-2 border-b border-[#1e2d4a] bg-[#0f1629]">
           <BarChart3 size={13} className="text-amber-400" />
-          <span className="text-[11px] font-medium text-slate-400">Akar Penyebab (SHAP)</span>
+          <span className="text-xs font-medium text-slate-400">Akar Penyebab (SHAP)</span>
         </div>
         <div className="p-3 space-y-2">
           {result.root_causes.slice(0, 6).map((rc) => {
@@ -32,10 +32,10 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
             return (
               <div key={rc.rank}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] text-slate-300 font-mono">
+                  <span className="text-xs text-slate-300 font-mono">
                     #{rc.rank} {rc.feature.replace(/_/g, ' ')}
                   </span>
-                  <span className="text-[10px] text-amber-400 tabular-nums">
+                  <span className="text-xs text-amber-400 tabular-nums">
                     {rc.importance_score.toFixed(3)}
                   </span>
                 </div>
@@ -56,9 +56,9 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
         <div className="rounded-xl border border-[#1e2d4a] bg-[#141c2e]">
           <div className="flex items-center gap-2 px-3 py-2 border-b border-[#1e2d4a]">
             <GitBranch size={13} className="text-violet-400" />
-            <span className="text-[11px] font-medium text-slate-400">Narasi Analisis</span>
+            <span className="text-xs font-medium text-slate-400">Narasi Analisis</span>
           </div>
-          <div className="px-3 py-3 text-xs text-slate-400 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
+          <div className="px-3 py-3 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
             {result.explanation}
           </div>
         </div>

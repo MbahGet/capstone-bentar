@@ -23,13 +23,13 @@ const STATUS_BG = {
 export default function KPICard({ label, value, unit, target, status }: Props) {
   return (
     <div className={`rounded-xl border px-4 py-3 ${STATUS_BG[status]}`}>
-      <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">{label}</div>
       <div className={`text-2xl font-bold tabular-nums ${STATUS_COLOR[status]}`}>
         {value}
         {unit && <span className="text-sm font-normal ml-1">{unit}</span>}
       </div>
       {target && (
-        <div className="text-[10px] text-slate-600 mt-0.5">Target: {target}</div>
+        <div className="text-xs text-slate-600 mt-0.5">Target: {target}</div>
       )}
     </div>
   );

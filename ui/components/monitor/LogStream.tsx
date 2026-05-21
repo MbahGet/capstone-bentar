@@ -40,14 +40,14 @@ export default function LogStream({ logs }: { logs: LogEntry[] }) {
       <div className="flex items-center justify-between px-5 py-3 border-b border-[#1e2d4a] bg-[#0f1629]">
         <div className="flex items-center gap-2">
           <Terminal size={14} className="text-slate-500" />
-          <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">Activity Log</span>
+          <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">Activity Log</span>
         </div>
         <div className="flex items-center gap-1">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setFilter(t.key)}
-              className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-colors ${
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                 filter === t.key
                   ? 'bg-[#1e2d4a] text-slate-200'
                   : 'text-slate-600 hover:text-slate-400'
@@ -60,7 +60,7 @@ export default function LogStream({ logs }: { logs: LogEntry[] }) {
       </div>
 
       {/* Log entries */}
-      <div className="bg-[#0a0e1a] font-mono text-[11px] h-56 overflow-y-auto">
+      <div className="bg-[#0a0e1a] font-mono text-xs h-56 overflow-y-auto">
         {filtered.length === 0 ? (
           <div className="flex items-center justify-center h-full text-slate-700">
             Belum ada aktivitas

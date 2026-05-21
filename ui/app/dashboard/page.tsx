@@ -1,336 +1,239 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Message, KPIResult, RCAResult, UploadedFile } from '@/lib/types';
-import { sendChat, uploadPDF, analyzeKPI, analyzeRCA, writeActivityLog } from '@/lib/api';
-import ChatWindow from '@/components/chat/ChatWindow';
-import PDFUpload from '@/components/upload/PDFUpload';
-import CSVUpload from '@/components/upload/CSVUpload';
-import KPICard from '@/components/kpi/KPICard';
-import AlertList from '@/components/kpi/AlertList';
-import DeviationTable from '@/components/kpi/DeviationTable';
-import RCAResultPanel from '@/components/rca/RCAResult';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { Message } from '@/lib/types';
+import { sendChat, writeActivityLog } from '@/lib/api';
 import {
-  FileText,
-  BarChart3,
-  GitBranch,
-  X,
-  Info,
-  Layers,
-} from 'lucide-react';
+  saveChatSession,
+  loadChatHistory,
+  saveActiveChat,
+  loadActiveChat,
+  clearActiveChat,
+  ChatSession,
+  ActiveChat,
+  HistoryMessage,
+} from '@/lib/history';
+import ChatWindow from '@/components/chat/ChatWindow';
+import ResponseModal, { ModalPayload } from '@/components/chat/ResponseModal';
+import HistorySidebar from '@/components/history/HistorySidebar';
+import { CalendarDays, Archive, X } from 'lucide-react';
 
+/* ─── Welcome message ────────────────────────────────────────────────────── */
 const WELCOME: Message = {
   id: 'welcome',
   role: 'assistant',
   content:
-    'Selamat datang di FactoryOps Copilot. Saya dapat membantu menganalisis data produksi, OEE, downtime, defect rate, dan melakukan analisis akar masalah (RCA).\n\nUpload dokumen PDF (SOP, manual, laporan QC) untuk referensi, atau ajukan pertanyaan langsung.',
+    'Selamat datang di FactoryOps Copilot. Ajukan pertanyaan tentang OEE, downtime, defect rate, atau minta analisis akar masalah (RCA). Untuk upload dokumen dan menjalankan analisis, buka halaman Monitor.',
   timestamp: new Date(),
   agentsCalled: [],
 };
 
-function SidebarSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-2">
-      <div className="text-[10px] uppercase tracking-widest text-slate-700 font-medium px-1">{title}</div>
-      {children}
-    </div>
-  );
+/* ─── Helper: HistoryMessage → Message ──────────────────────────────────── */
+function toMessage(hm: HistoryMessage, i: number): Message {
+  return {
+    id: `r-${i}-${hm.timestamp}`,
+    role: hm.role as 'user' | 'assistant',
+    content: hm.content,
+    agentsCalled: hm.agentsCalled,
+    sources: hm.sources,
+    timestamp: new Date(hm.timestamp),
+    isError: hm.isError,
+  };
 }
 
-function UploadedFilePill({ file }: { file: UploadedFile }) {
-  return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#141c2e] border border-[#1e2d4a]">
-      <FileText size={12} className="text-slate-500 shrink-0" />
-      <span className="text-[11px] text-slate-400 truncate">{file.name}</span>
-      <span
-        className={`ml-auto text-[9px] shrink-0 ${
-          file.status === 'done' ? 'text-emerald-500' : file.status === 'error' ? 'text-red-400' : 'text-amber-400'
-        }`}
-      >
-        {file.status === 'done' ? '✓' : file.status === 'error' ? '✗' : '…'}
-      </span>
-    </div>
-  );
-}
-
-type ResultTab = 'kpi' | 'rca';
-
+/* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function DashboardPage() {
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [chatLoading, setChatLoading] = useState(false);
-  const [kpiLoading, setKpiLoading] = useState(false);
-  const [rcaLoading, setRcaLoading] = useState(false);
-  const [kpiResult, setKpiResult] = useState<KPIResult | null>(null);
-  const [rcaResult, setRcaResult] = useState<RCAResult | null>(null);
-  const [resultTab, setResultTab] = useState<ResultTab>('kpi');
-  const [files, setFiles] = useState<UploadedFile[]>([]);
-  const [rcaFiles, setRcaFiles] = useState<{ productionLog?: File; defectData?: File; downtimeLog?: File }>({});
+  const [modal, setModal] = useState<ModalPayload | null>(null);
 
-  const addFile = (name: string, size: number, type: 'pdf' | 'csv', status: UploadedFile['status']) => {
-    const f: UploadedFile = { id: Date.now().toString(), name, size, type, uploadedAt: new Date(), status };
-    setFiles((prev) => [f, ...prev].slice(0, 10));
-    return f;
-  };
+  /* History sidebar */
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
 
+  /* Previous-day confirmation */
+  const [pendingArchive, setPendingArchive] = useState<ActiveChat | null>(null);
+
+  /* Session tracking — refs, no re-renders */
+  const sessionId      = useRef(`hist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const sessionStartAt = useRef(new Date().toISOString());
+  const historyBuf     = useRef<HistoryMessage[]>([]);
+
+  /* ── On mount: restore today's chat OR prompt to archive yesterday ── */
+  useEffect(() => {
+    setSessions(loadChatHistory());
+
+    const active = loadActiveChat();
+    if (!active) return;
+
+    const today = new Date().toDateString();
+    if (active.date === today) {
+      /* Same day → restore session into chat window */
+      sessionId.current      = active.sessionId;
+      sessionStartAt.current = active.startedAt;
+      historyBuf.current     = [...active.messages];
+
+      const restored = active.messages.filter((m) => m.content).map(toMessage);
+      if (restored.length > 0) {
+        setMessages([WELCOME, ...restored]);
+      }
+    } else {
+      /* Different day → ask user what to do */
+      setPendingArchive(active);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* Save current buffer as the "active chat" (today's work, not yet archived) */
+  function flushActive() {
+    saveActiveChat({
+      date: new Date().toDateString(),
+      sessionId: sessionId.current,
+      startedAt: sessionStartAt.current,
+      messages: historyBuf.current,
+    });
+  }
+
+  /* ── Archive confirmation handlers ── */
+  function handleArchive() {
+    if (!pendingArchive) return;
+    saveChatSession({
+      id: pendingArchive.sessionId,
+      startedAt: pendingArchive.startedAt,
+      messages: pendingArchive.messages,
+    });
+    clearActiveChat();
+    setSessions(loadChatHistory());
+    setPendingArchive(null);
+  }
+
+  function handleDismissArchive() {
+    clearActiveChat();
+    setPendingArchive(null);
+  }
+
+  /* ── Chat ── */
   const handleSend = useCallback(async (content: string) => {
     const userMsg: Message = { id: Date.now().toString(), role: 'user', content, timestamp: new Date() };
     const loadId = (Date.now() + 1).toString();
     const loadMsg: Message = { id: loadId, role: 'assistant', content: '', timestamp: new Date(), isLoading: true };
+
     setMessages((prev) => [...prev, userMsg, loadMsg]);
     setChatLoading(true);
 
+    historyBuf.current.push({ role: 'user', content, timestamp: userMsg.timestamp.toISOString() });
+
     try {
       const start = Date.now();
-      const data = await sendChat(content);
+      const data  = await sendChat(content);
       const latency = Date.now() - start;
       writeActivityLog({ agent: 'agent1', method: 'POST', endpoint: '/webhook/chat', statusCode: 200, latency });
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === loadId
-            ? { ...m, content: data.response ?? 'Tidak ada respons.', agentsCalled: data.agents_called ?? [], sources: data.sources ?? [], isLoading: false }
-            : m
-        )
-      );
+
+      const assistantMsg: Message = {
+        id: loadId,
+        role: 'assistant',
+        content: data.response ?? 'Tidak ada respons.',
+        agentsCalled: data.agents_called ?? [],
+        sources: data.sources ?? [],
+        timestamp: new Date(),
+        isLoading: false,
+      };
+
+      setMessages((prev) => prev.map((m) => (m.id === loadId ? assistantMsg : m)));
+      setModal({ type: 'chat', message: assistantMsg, query: content });
+
+      historyBuf.current.push({
+        role: 'assistant',
+        content: assistantMsg.content,
+        timestamp: assistantMsg.timestamp.toISOString(),
+        agentsCalled: assistantMsg.agentsCalled,
+        sources: assistantMsg.sources,
+      });
     } catch {
       writeActivityLog({ agent: 'agent1', method: 'POST', endpoint: '/webhook/chat', statusCode: null, latency: null, error: 'Connection failed' });
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === loadId
-            ? { ...m, content: 'Agent 1 tidak dapat dijangkau. Pastikan sistem sudah berjalan.', isLoading: false, isError: true }
-            : m
-        )
-      );
+      const errMsg: Message = {
+        id: loadId,
+        role: 'assistant',
+        content: 'Agent 1 tidak dapat dijangkau. Pastikan sistem sudah berjalan.',
+        timestamp: new Date(),
+        isLoading: false,
+        isError: true,
+      };
+      setMessages((prev) => prev.map((m) => (m.id === loadId ? errMsg : m)));
+      historyBuf.current.push({
+        role: 'assistant',
+        content: errMsg.content,
+        timestamp: errMsg.timestamp.toISOString(),
+        isError: true,
+      });
     } finally {
       setChatLoading(false);
+      flushActive();   // persist as today's active chat (not history)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleUploadPDF = useCallback(async (file: File) => {
-    const f = addFile(file.name, file.size, 'pdf', 'uploading');
-    try {
-      await uploadPDF(file);
-      writeActivityLog({ agent: 'agent1', method: 'POST', endpoint: '/webhook/upload-pdf', statusCode: 200, latency: null });
-      setFiles((prev) => prev.map((x) => (x.id === f.id ? { ...x, status: 'done' } : x)));
-    } catch {
-      writeActivityLog({ agent: 'agent1', method: 'POST', endpoint: '/webhook/upload-pdf', statusCode: null, latency: null, error: 'Upload failed' });
-      setFiles((prev) => prev.map((x) => (x.id === f.id ? { ...x, status: 'error' } : x)));
-      throw new Error('Upload failed');
-    }
-  }, []);
-
-  const handleAnalyzeKPI = useCallback(async (file: File) => {
-    setKpiLoading(true);
-    try {
-      const start = Date.now();
-      const result = await analyzeKPI(file);
-      const latency = Date.now() - start;
-      writeActivityLog({ agent: 'agent2', method: 'POST', endpoint: '/analyze', statusCode: 200, latency });
-      setKpiResult(result);
-      setResultTab('kpi');
-    } catch {
-      writeActivityLog({ agent: 'agent2', method: 'POST', endpoint: '/analyze', statusCode: null, latency: null, error: 'Analysis failed' });
-    } finally {
-      setKpiLoading(false);
-    }
-  }, []);
-
-  const handleAnalyzeRCA = useCallback(async () => {
-    const { productionLog, defectData, downtimeLog } = rcaFiles;
-    if (!productionLog || !defectData || !downtimeLog) return;
-    setRcaLoading(true);
-    try {
-      const start = Date.now();
-      const result = await analyzeRCA(productionLog, defectData, downtimeLog);
-      const latency = Date.now() - start;
-      writeActivityLog({ agent: 'agent3', method: 'POST', endpoint: '/analyze', statusCode: 200, latency });
-      setRcaResult(result);
-      setResultTab('rca');
-    } catch {
-      writeActivityLog({ agent: 'agent3', method: 'POST', endpoint: '/analyze', statusCode: null, latency: null, error: 'RCA failed' });
-    } finally {
-      setRcaLoading(false);
-    }
-  }, [rcaFiles]);
-
-  const hasResults = kpiResult !== null || rcaResult !== null;
-
+  /* ─── Render ──────────────────────────────────────────────────────────── */
   return (
     <div className="flex h-[calc(100vh-64px)]">
-      {/* Sidebar */}
-      <aside className="w-60 shrink-0 flex flex-col border-r border-[#1e2d4a] bg-[#0f1629] overflow-y-auto">
-        <div className="p-4 space-y-6">
-          {/* PDF section */}
-          <SidebarSection title="Dokumen">
-            <PDFUpload onUpload={handleUploadPDF} />
-            {files.filter((f) => f.type === 'pdf').map((f) => (
-              <UploadedFilePill key={f.id} file={f} />
-            ))}
-          </SidebarSection>
 
-          {/* KPI section */}
-          <SidebarSection title="Analisis KPI (Agent 2)">
-            <CSVUpload
-              label="Upload CSV Produksi"
-              description="production_daily.csv"
-              onAnalyze={handleAnalyzeKPI}
-              loading={kpiLoading}
-            />
-          </SidebarSection>
+      {/* ── LEFT: History sidebar ── */}
+      <aside className="w-60 shrink-0 flex flex-col border-r border-[#1e2d4a] bg-[#0f1629] overflow-hidden">
 
-          {/* RCA section */}
-          <SidebarSection title="Analisis RCA (Agent 3)">
-            <div className="space-y-2">
-              {(
-                [
-                  { key: 'productionLog', label: 'Production Log', hint: 'production_log.csv' },
-                  { key: 'defectData', label: 'Defect Data', hint: 'defect_data.csv' },
-                  { key: 'downtimeLog', label: 'Downtime Log', hint: 'downtime_log.csv' },
-                ] as const
-              ).map(({ key, label, hint }) => (
-                <label key={key} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#1e2d4a] bg-[#141c2e] hover:border-amber-500/30 cursor-pointer transition-colors">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) setRcaFiles((prev) => ({ ...prev, [key]: f }));
-                      e.target.value = '';
-                    }}
-                  />
-                  <GitBranch size={12} className="text-amber-500 shrink-0" />
-                  <div className="min-w-0">
-                    <div className="text-[11px] text-slate-400">{label}</div>
-                    <div className="text-[10px] text-slate-700 truncate">
-                      {rcaFiles[key]?.name ?? hint}
-                    </div>
-                  </div>
-                  {rcaFiles[key] && <span className="ml-auto text-emerald-500 text-[10px]">✓</span>}
-                </label>
-              ))}
+        {/* Confirmation banner — shown when there's a previous-day chat to archive */}
+        {pendingArchive && (
+          <div className="m-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 shrink-0">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <CalendarDays size={13} className="text-amber-400" />
+              <span className="text-xs font-semibold text-amber-400">Percakapan kemarin</span>
               <button
-                onClick={handleAnalyzeRCA}
-                disabled={!rcaFiles.productionLog || !rcaFiles.defectData || !rcaFiles.downtimeLog || rcaLoading}
-                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-amber-600/20 border border-amber-500/30 text-amber-400 text-xs font-medium hover:bg-amber-600/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={handleDismissArchive}
+                className="ml-auto text-slate-600 hover:text-slate-400 transition-colors"
               >
-                {rcaLoading ? 'Menganalisis...' : 'Jalankan RCA'}
+                <X size={12} />
               </button>
             </div>
-          </SidebarSection>
-
-          {/* Help */}
-          <SidebarSection title="Panduan">
-            <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-[#141c2e] border border-[#1e2d4a]">
-              <Info size={12} className="text-slate-600 shrink-0 mt-0.5" />
-              <p className="text-[10px] text-slate-700 leading-relaxed">
-                Chat untuk bertanya tentang OEE, downtime, atau defect. Upload CSV langsung untuk analisis cepat.
-              </p>
+            <p className="text-xs text-slate-500 leading-relaxed mb-2.5">
+              {pendingArchive.messages.filter((m) => m.role === 'user').length} pertanyaan dari&nbsp;
+              {new Date(pendingArchive.startedAt).toLocaleDateString('id-ID', {
+                day: '2-digit', month: 'short', year: 'numeric',
+              })}.
+              Simpan ke riwayat?
+            </p>
+            <div className="flex gap-1.5">
+              <button
+                onClick={handleArchive}
+                className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-medium hover:bg-amber-500/30 transition-colors"
+              >
+                <Archive size={11} />
+                Simpan
+              </button>
+              <button
+                onClick={handleDismissArchive}
+                className="flex-1 py-1.5 rounded-lg border border-[#1e2d4a] text-slate-500 text-xs hover:text-slate-400 transition-colors"
+              >
+                Abaikan
+              </button>
             </div>
-          </SidebarSection>
-        </div>
+          </div>
+        )}
+
+        <HistorySidebar
+          sessions={sessions}
+          onSelect={(s) => setModal({ type: 'history', session: s })}
+        />
       </aside>
 
-      {/* Chat area */}
-      <ChatWindow messages={messages} onSend={handleSend} isLoading={chatLoading} />
+      {/* ── CENTER: Chat ── */}
+      <div className="flex flex-col flex-1 min-w-0">
+        <ChatWindow
+          messages={messages}
+          onSend={handleSend}
+          isLoading={chatLoading}
+        />
+      </div>
 
-      {/* Analysis panel */}
-      {hasResults && (
-        <aside className="w-80 shrink-0 flex flex-col border-l border-[#1e2d4a] bg-[#0f1629] overflow-hidden">
-          {/* Panel header */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-[#1e2d4a] shrink-0">
-            <Layers size={14} className="text-slate-500" />
-            <span className="text-xs font-medium text-slate-400">Hasil Analisis</span>
-            <button
-              onClick={() => { setKpiResult(null); setRcaResult(null); }}
-              className="ml-auto p-1 rounded-lg hover:bg-[#1a2540] text-slate-600 hover:text-slate-400 transition-colors"
-            >
-              <X size={13} />
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex border-b border-[#1e2d4a] shrink-0">
-            {kpiResult && (
-              <button
-                onClick={() => setResultTab('kpi')}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
-                  resultTab === 'kpi' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-600 hover:text-slate-400'
-                }`}
-              >
-                <BarChart3 size={12} />
-                KPI
-              </button>
-            )}
-            {rcaResult && (
-              <button
-                onClick={() => setResultTab('rca')}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
-                  resultTab === 'rca' ? 'border-amber-500 text-amber-400' : 'border-transparent text-slate-600 hover:text-slate-400'
-                }`}
-              >
-                <GitBranch size={12} />
-                RCA
-              </button>
-            )}
-          </div>
-
-          {/* Panel content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {resultTab === 'kpi' && kpiResult && (
-              <>
-                {/* KPI summary cards */}
-                <div className="grid grid-cols-2 gap-2">
-                  <KPICard
-                    label="OEE"
-                    value={kpiResult.summary.avg_oee.toFixed(1)}
-                    unit="%"
-                    target="≥80%"
-                    status={kpiResult.summary.avg_oee >= 80 ? 'good' : kpiResult.summary.avg_oee >= 70 ? 'warning' : 'critical'}
-                  />
-                  <KPICard
-                    label="Defect Rate"
-                    value={kpiResult.summary.avg_defect_rate.toFixed(1)}
-                    unit="%"
-                    target="≤3%"
-                    status={kpiResult.summary.avg_defect_rate <= 3 ? 'good' : kpiResult.summary.avg_defect_rate <= 5 ? 'warning' : 'critical'}
-                  />
-                  <KPICard
-                    label="Downtime Rate"
-                    value={kpiResult.summary.avg_downtime_rate.toFixed(1)}
-                    unit="%"
-                    target="≤15%"
-                    status={kpiResult.summary.avg_downtime_rate <= 15 ? 'good' : kpiResult.summary.avg_downtime_rate <= 20 ? 'warning' : 'critical'}
-                  />
-                  <KPICard
-                    label="Deviasi"
-                    value={kpiResult.model_metrics.deviation_count.toString()}
-                    unit="mesin"
-                    status={kpiResult.model_metrics.deviation_count === 0 ? 'good' : 'warning'}
-                  />
-                </div>
-
-                <AlertList alerts={kpiResult.alerts} />
-                <DeviationTable deviations={kpiResult.top_deviations} />
-
-                {kpiResult.recommendation?.text && (
-                  <div className="rounded-xl border border-[#1e2d4a] bg-[#141c2e]">
-                    <div className="px-3 py-2 border-b border-[#1e2d4a] text-[11px] font-medium text-slate-400">
-                      Rekomendasi AI
-                    </div>
-                    <p className="px-3 py-3 text-xs text-slate-400 leading-relaxed whitespace-pre-wrap">
-                      {kpiResult.recommendation.text}
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {resultTab === 'rca' && rcaResult && (
-              <RCAResultPanel result={rcaResult} />
-            )}
-          </div>
-        </aside>
-      )}
+      {/* Modal */}
+      <ResponseModal payload={modal} onClose={() => setModal(null)} />
     </div>
   );
 }

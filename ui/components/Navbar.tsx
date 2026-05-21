@@ -4,6 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Factory, LayoutDashboard, MonitorCheck } from 'lucide-react';
 
+const NAV = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/monitor',   label: 'Monitor',   icon: MonitorCheck },
+];
+
 export default function Navbar() {
   const pathname = usePathname();
 
@@ -16,35 +21,27 @@ export default function Navbar() {
         </div>
         <div className="leading-none">
           <div className="text-white font-bold text-sm tracking-wide">FactoryOps Copilot</div>
-          <div className="text-[#475569] text-[10px] tracking-wide uppercase">Manufacturing AI Platform</div>
+          <div className="text-slate-600 text-xs tracking-wide uppercase">Manufacturing AI Platform</div>
         </div>
       </div>
 
       {/* Nav tabs */}
       <div className="flex-1 flex justify-center">
         <div className="flex items-center gap-1 bg-[#141c2e] border border-[#1e2d4a] rounded-xl p-1">
-          <Link
-            href="/dashboard"
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-              pathname === '/dashboard'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'
-            }`}
-          >
-            <LayoutDashboard size={14} />
-            Dashboard
-          </Link>
-          <Link
-            href="/monitor"
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-              pathname === '/monitor'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'
-            }`}
-          >
-            <MonitorCheck size={14} />
-            Monitor
-          </Link>
+          {NAV.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                pathname === href
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-[#1a2540]'
+              }`}
+            >
+              <Icon size={14} />
+              {label}
+            </Link>
+          ))}
         </div>
       </div>
 

@@ -16,11 +16,18 @@
   --foreground: #e2e8f0;
 }
 
-html,
+html {
+  background: var(--background);
+  color: var(--foreground);
+  height: 100%;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   height: 100%;
+  /* Minimum readable base — rem still anchored to html default 16px */
+  font-size: 14px;
 }
 
 /* Custom scrollbar */
