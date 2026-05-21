@@ -5,15 +5,16 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "chat",
+        "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        80,
-        896
+        512,
+        592
       ],
-      "id": "08a429ac-bb9a-4f38-91d8-dd2c5f0e1363",
+      "id": "3a28e249-d26e-49ac-874f-daf874a782fd",
       "name": "Webhook Chat",
       "webhookId": "ab2d4d21-1dc3-4423-bf78-c13ac442c9d6"
     },
@@ -94,10 +95,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        480,
-        256
+        912,
+        -48
       ],
-      "id": "a76c6e8b-4180-4215-bda4-e4c40a8aa864",
+      "id": "4edbc9a3-4aff-4577-98f9-27a889db54d7",
       "name": "Switch"
     },
     {
@@ -109,10 +110,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        720,
-        96
+        1152,
+        -208
       ],
-      "id": "0173e2f2-edf9-44d0-a863-d07dbf7b19ef",
+      "id": "d961f67f-4381-4cc4-8e1d-7b9e8879fbb6",
       "name": "Extract from PDF"
     },
     {
@@ -123,10 +124,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        720,
-        272
+        1152,
+        -32
       ],
-      "id": "c5ff1837-82c1-44a2-87f2-61278c2ab225",
+      "id": "15152ac8-bc70-403e-af92-cbf3b30d86f9",
       "name": "Extract from CSV"
     },
     {
@@ -139,10 +140,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        720,
-        448
+        1152,
+        144
       ],
-      "id": "91dfb6d6-0f6d-4efb-81fd-9a92119ba5ef",
+      "id": "b7503b30-cc4f-418d-b08a-8307a4ccdaa9",
       "name": "Extract from txt/md/log"
     },
     {
@@ -154,10 +155,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        288,
-        272
+        720,
+        -32
       ],
-      "id": "50b0d5c5-2f11-4b90-b48b-2763bce6fbb3",
+      "id": "d388bcaa-5ed8-4775-af80-9aa0e9de9d94",
       "name": "Split Out"
     },
     {
@@ -167,25 +168,26 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        960,
-        256
+        1392,
+        -48
       ],
-      "id": "55888954-dacf-4cf1-b191-8c6f39635392",
+      "id": "77c1909f-811b-46e8-82a5-cced6c5b2804",
       "name": "Merge"
     },
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "upload",
+        "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        80,
-        272
+        512,
+        -32
       ],
-      "id": "d75e9508-c1af-4177-8ff4-9b0e0c832d2b",
+      "id": "52b486b3-308a-4e9b-893c-18442ee1e999",
       "name": "Webhook Upload",
       "webhookId": "50ad0e3e-c9a2-4f5a-ae97-0d3d3ce23ddf"
     },
@@ -200,10 +202,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        352,
-        896
+        784,
+        592
       ],
-      "id": "b7a8daac-2e3b-43b9-b60f-ebbd58cda462",
+      "id": "31b31fd7-7fc6-412e-8530-7d7b9ffddc42",
       "name": "Agent 1"
     },
     {
@@ -228,10 +230,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        608,
-        1216
+        1040,
+        912
       ],
-      "id": "0fdd5b27-d24b-4bf9-bf1f-aab609f50b1b",
+      "id": "84c6a28f-81ca-492e-99f1-1657328cb130",
       "name": "Call Agent 2 (Decision Support)"
     },
     {
@@ -256,10 +258,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        784,
-        1216
+        1216,
+        912
       ],
-      "id": "719d61f2-3931-4707-a5cb-335ea7aa7b47",
+      "id": "8c6aaf8f-b00f-4055-bf77-6267f89fc83e",
       "name": "Call Agent 3 (RCA)"
     },
     {
@@ -271,10 +273,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        928,
-        896
+        1360,
+        592
       ],
-      "id": "8e94edc2-34ee-4ed9-8e5f-fd2a271cbf69",
+      "id": "d35fd9f2-a12b-4fc4-ae06-f9ce78a2bc5d",
       "name": "Respond to Webhook"
     },
     {
@@ -285,10 +287,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1424,
-        272
+        1856,
+        -32
       ],
-      "id": "cbd9fae0-d196-4585-9f64-c512cbf731cf",
+      "id": "37e608b9-c79e-4d6d-b8f6-48e7191b2dde",
       "name": "Loop Over Items"
     },
     {
@@ -298,10 +300,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1728,
-        128
+        2160,
+        -176
       ],
-      "id": "8a0a5f5b-1c63-474e-8f87-18b4959a308a",
+      "id": "64240efe-b849-4625-aee0-a597bb2e37cb",
       "name": "Respond to Webhook Upload"
     },
     {
@@ -314,10 +316,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        0,
-        32
+        432,
+        -272
       ],
-      "id": "35695092-0cd3-4600-b090-d427fdc3180e",
+      "id": "cf0dc3c1-58f6-4807-8266-4cb514b612a1",
       "name": "Sticky Note"
     },
     {
@@ -330,10 +332,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        0,
-        768
+        432,
+        464
       ],
-      "id": "f0ec2611-99be-4c7b-adab-117a7fceee83",
+      "id": "9100c064-6d54-4c00-8b4b-26a8f0e5c90e",
       "name": "Sticky Note1"
     },
     {
@@ -351,10 +353,10 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        1728,
-        288
+        2160,
+        -16
       ],
-      "id": "b8ffe645-6f8e-4244-ac73-b0dc2802d62b",
+      "id": "40c44a09-cc35-4855-9c0a-7c90c1455c0c",
       "name": "Vector Store",
       "credentials": {
         "qdrantApi": {
@@ -370,10 +372,10 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        1648,
-        528
+        2080,
+        224
       ],
-      "id": "94b44cee-c578-443a-b61a-00ce5f7416ab",
+      "id": "0878f60f-f7db-4b69-b16a-bce5c648a28b",
       "name": "Document Embeddings",
       "credentials": {
         "ollamaApi": {
@@ -389,10 +391,10 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        160,
-        1392
+        592,
+        1088
       ],
-      "id": "3c5268c0-f8bf-4242-a0d1-f93bdb4efbbe",
+      "id": "bca0e3cb-8eeb-4c19-a69f-21ca2ae14264",
       "name": "Query Embeddings",
       "credentials": {
         "ollamaApi": {
@@ -408,10 +410,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        720,
-        896
+        1152,
+        592
       ],
-      "id": "dba082c0-7ab3-47a0-9b3a-383b02e63249",
+      "id": "b152db6d-42d2-488a-b400-fcebd4951950",
       "name": "Formatter"
     },
     {
@@ -421,10 +423,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1184,
-        272
+        1616,
+        -32
       ],
-      "id": "df93c4a1-f09a-488f-8d2a-3b49dbea173a",
+      "id": "aa935171-74f0-481d-89d9-623de19b6f8d",
       "name": "Format Document"
     },
     {
@@ -445,10 +447,10 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        160,
-        1216
+        592,
+        912
       ],
-      "id": "655aba96-4b1a-4e5f-9c5e-e11b7abd7cb6",
+      "id": "2c9dd61d-a517-4127-ab7e-2168659a0454",
       "name": "Get Document",
       "credentials": {
         "qdrantApi": {
@@ -465,10 +467,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        448,
-        1216
+        880,
+        912
       ],
-      "id": "e2c9c5bb-fbb1-4a4d-afbf-510f553bc4a9",
+      "id": "731fdb52-4985-4aba-9be2-36dfb74464bd",
       "name": "Simple Memory"
     },
     {
@@ -480,10 +482,10 @@
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
       "position": [
-        1856,
-        528
+        2288,
+        224
       ],
-      "id": "26515b31-3c65-42d9-9644-e6436a8031ae",
+      "id": "c6159bd1-a8b9-4fff-bf92-8538e452ea17",
       "name": "Default Data Loader"
     },
     {
@@ -494,10 +496,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        176,
-        1056
+        608,
+        752
       ],
-      "id": "d7c54d7f-064a-4910-be01-78c9c9c370dd",
+      "id": "2be4af1b-1f05-4cfe-816a-e7cea0dc73d8",
       "name": "Groq Chat Model",
       "credentials": {
         "groqApi": {
@@ -762,16 +764,15 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "591e4ee6-f782-4c1e-9f44-e352de6dad1f",
+  "versionId": "2b1bcb13-bac6-4760-bebf-8614097d6e8b",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "353bfeeab42a2e97bf84edbb3ea79860432e4584619587c08e3157c36aa74ee0"
   },
-  "id": "LWnkKrrAB8DTmF2i",
+  "id": "OKaMMiEDKosvm6By",
   "tags": []
 }
