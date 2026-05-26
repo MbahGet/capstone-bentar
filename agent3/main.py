@@ -39,6 +39,7 @@ async def root():
     }
 
 @app.post("/query")
+@app.post("/report")
 async def query_rca(request: RCAQueryRequest):
     """
     Endpoint khusus untuk dipanggil oleh Agent 1 (n8n).

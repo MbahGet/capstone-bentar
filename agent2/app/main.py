@@ -57,6 +57,7 @@ app = FastAPI(
 
 
 @app.post("/query")
+@app.post("/report")
 async def query_agent(request: QueryRequest):
     if not TRAINING_DATA_PATH.exists():
         raise HTTPException(status_code=404, detail="Data CSV tidak ditemukan")

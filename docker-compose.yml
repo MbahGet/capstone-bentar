@@ -1,10 +1,11 @@
+name: capstone-factory
 services:
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: qdrant
+    container_name: qdrant-capstone
     restart: unless-stopped
     ports:
-      - "6333:6333"
+      - "6335:6333"
     volumes:
       - qdrant_storage:/qdrant/storage
     environment:
@@ -12,13 +13,13 @@ services:
 
   agent1:
     image: n8nio/n8n:latest
-    container_name: agent1
+    container_name: agent1-capstone
     restart: unless-stopped
     ports:
-      - "5678:5678"
+      - "5680:5680"
     environment:
       - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
+      - N8N_PORT=5680
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
@@ -30,16 +31,16 @@ services:
     build:
       context: ./agent2
       dockerfile: Dockerfile
-    container_name: agent2
+    container_name: agent2-capstone
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8002:8000"
     volumes:
       - ./agent2/data:/app/data
     environment:
       PYTHONUNBUFFERED: "1"
       GROQ_API_KEY: ${GROQ_API_KEY:-}
-      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
     depends_on:
       - qdrant
 
@@ -47,16 +48,16 @@ services:
     build:
       context: ./agent3
       dockerfile: Dockerfile
-    container_name: agent3
+    container_name: agent3-capstone
     restart: unless-stopped
     ports:
-      - "9000:9000"
+      - "9003:9000"
     volumes:
       - ./agent3/data:/app/data
     environment:
       PYTHONUNBUFFERED: "1"
       GROQ_API_KEY: ${GROQ_API_KEY:-}
-      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-120b}
     depends_on:
       - qdrant
 
@@ -64,14 +65,14 @@ services:
     build:
       context: ./ui
       dockerfile: Dockerfile
-    container_name: ui
+    container_name: ui-capstone
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3003:3000"
     environment:
       NODE_ENV: production
       # Di dalam Docker network, agent diakses lewat nama service, bukan localhost
-      AGENT1_URL: http://agent1:5678
+      AGENT1_URL: http://agent1:5680
       AGENT2_URL: http://agent2:8000
       AGENT3_URL: http://agent3:9000
     depends_on:

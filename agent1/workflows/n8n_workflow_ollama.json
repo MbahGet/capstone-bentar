@@ -462,7 +462,7 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.body.sessionId }}"
+        "sessionKey": "={{ $('Webhook Chat').item.json.body.sessionId }}"
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
@@ -490,7 +490,7 @@
     },
     {
       "parameters": {
-        "model": "openai/gpt-oss-120b",
+        "model": "llama-3.3-70b-versatile",
         "options": {
           "temperature": 0.2
         }
@@ -512,7 +512,7 @@
     },
     {
       "parameters": {
-        "model": "llama3.2:3b",
+        "model": "openai/gpt-oss-120b",
         "options": {
           "temperature": 0.2
         }

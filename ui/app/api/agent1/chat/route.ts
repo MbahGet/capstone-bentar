@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // n8n webhook response format: { reply: "...", sessionId: "..." }
 // We normalise it to { response, agents_called, sources } for the UI.
 export async function POST(req: NextRequest) {
-  const url = process.env.AGENT1_URL ?? 'http://localhost:5678';
+  const url = process.env.AGENT1_URL ?? 'http://localhost:5680';
   try {
     const body = await req.json();
     const res = await fetch(`${url}/webhook/chat`, {
