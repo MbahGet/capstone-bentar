@@ -1,5 +1,4 @@
 import { RCAResult } from '@/lib/types';
-import { GitBranch, BarChart3 } from 'lucide-react';
 
 export default function RCAResultPanel({ result }: { result: RCAResult }) {
   const maxScore = result.root_causes[0]?.importance_score ?? 1;
@@ -13,7 +12,7 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
           { label: 'Insiden Defect', value: result.summary.defect_incidents_detected.toLocaleString() },
           { label: 'Defect Rate', value: `${result.summary.defect_rate_percentage.toFixed(1)}%` },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-[#141c2e] border border-[#1e2d4a] rounded-xl px-3 py-2 text-center">
+          <div key={label} className="bg-bg-card border border-bd rounded-xl px-3 py-2 text-center">
             <div className="text-xs text-slate-600">{label}</div>
             <div className="text-sm font-bold text-slate-200 mt-0.5">{value}</div>
           </div>
@@ -21,10 +20,15 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
       </div>
 
       {/* Root causes */}
-      <div className="rounded-xl border border-[#1e2d4a] overflow-hidden">
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-[#1e2d4a] bg-[#0f1629]">
-          <BarChart3 size={13} className="text-amber-400" />
-          <span className="text-xs font-medium text-slate-400">Akar Penyebab (SHAP)</span>
+      <div className="rounded-xl border border-bd overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-bd bg-bg-secondary">
+          <div className="flex items-center gap-2">
+            <img src="/icons/magnifying.svg" className="w-[13px] h-[13px] invert opacity-80" alt="Search" />
+            <span className="text-xs font-semibold text-slate-200">Akar Penyebab Utama</span>
+          </div>
+          <span className="text-[9px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
+            Explainable AI (SHAP)
+          </span>
         </div>
         <div className="p-3 space-y-2">
           {result.root_causes.slice(0, 6).map((rc) => {
@@ -39,7 +43,7 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
                     {rc.importance_score.toFixed(3)}
                   </span>
                 </div>
-                <div className="h-1.5 bg-[#1e2d4a] rounded-full overflow-hidden">
+                <div className="h-1.5 bg-bd rounded-full overflow-hidden">
                   <div
                     className="h-full bg-amber-500 rounded-full transition-all"
                     style={{ width: `${pct}%` }}
@@ -53,12 +57,19 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
 
       {/* Explanation */}
       {result.explanation && (
-        <div className="rounded-xl border border-[#1e2d4a] bg-[#141c2e]">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-[#1e2d4a]">
-            <GitBranch size={13} className="text-violet-400" />
-            <span className="text-xs font-medium text-slate-400">Narasi Analisis</span>
+        <div className="rounded-2xl border border-violet-500/30 bg-linear-to-r from-violet-950/15 via-indigo-950/15 to-blue-950/15 p-4 shadow-md relative overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <img src="/icons/bot.svg" className="w-[14px] h-[14px] invert opacity-80" alt="Bot" />
+              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                Narasi Analisis
+              </span>
+            </div>
+            <span className="text-[9px] bg-violet-500/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
+              LLM Reasoning
+            </span>
           </div>
-          <div className="px-3 py-3 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
+          <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
             {result.explanation}
           </div>
         </div>

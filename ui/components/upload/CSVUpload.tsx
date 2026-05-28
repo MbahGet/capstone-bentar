@@ -32,7 +32,7 @@ export default function CSVUpload({ label, description, onAnalyze, loading }: Pr
       <button
         onClick={() => !loading && inputRef.current?.click()}
         disabled={loading}
-        className="flex items-center gap-3 w-full rounded-xl border border-[#1e2d4a] bg-[#141c2e] hover:border-blue-500/50 hover:bg-[#1a2540] transition-all px-3 py-2.5 text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        className="flex items-center gap-3 w-full rounded-xl border border-bd bg-bg-card hover:border-blue-500/50 hover:bg-bg-hover transition-all px-3 py-2.5 text-left disabled:opacity-60 disabled:cursor-not-allowed"
       >
         <input
           ref={inputRef}

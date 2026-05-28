@@ -1,3 +1,5 @@
+import { FileAttachment, KPIResult, RCAResult } from './types';
+
 /* ─── Shared message shape ───────────────────────────────────────────────── */
 export interface HistoryMessage {
   role: 'user' | 'assistant';
@@ -6,7 +8,11 @@ export interface HistoryMessage {
   agentsCalled?: string[];
   sources?: string[];
   isError?: boolean;
+  attachments?: FileAttachment[];
+  kpiResult?: KPIResult;
+  rcaResult?: RCAResult;
 }
+
 
 /* ─── Archived sessions (past days, user confirmed) ─────────────────────── */
 export interface ChatSession {

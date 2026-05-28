@@ -9,7 +9,7 @@ function getSessionId(): string {
 }
 
 export async function sendChat(query: string): Promise<{ response: string; agents_called: string[]; sources: string[] }> {
-  const res = await fetch('/api/agent1/chat', {
+  const res = await fetch('/api/agent1/chat-ollama', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ chatInput: query, sessionId: getSessionId() }),
@@ -21,7 +21,7 @@ export async function sendChat(query: string): Promise<{ response: string; agent
 export async function uploadPDF(file: File): Promise<{ success: boolean; message?: string }> {
   const fd = new FormData();
   fd.append('file', file);
-  const res = await fetch('/api/agent1/upload', {
+  const res = await fetch('/api/agent1/upload-ollama', {
     method: 'POST',
     body: fd,
   });
@@ -40,21 +40,33 @@ export async function analyzeKPI(file: File): Promise<KPIResult> {
   return res.json();
 }
 
-export async function analyzeRCA(
-  productionLog: File,
-  defectData: File,
-  downtimeLog: File
-): Promise<RCAResult> {
+export async function analyzeRCA(file: File): Promise<RCAResult> {
   const fd = new FormData();
-  fd.append('production_log', productionLog);
-  fd.append('defect_data', defectData);
-  fd.append('downtime_log', downtimeLog);
+  // Send same integrated CSV to all 3 fields
+  fd.append('production_log', file);
+  fd.append('defect_data', file);
+  fd.append('downtime_log', file);
   const res = await fetch('/api/agent3/analyze', {
     method: 'POST',
     body: fd,
   });
   if (!res.ok) throw new Error('RCA analysis failed');
   return res.json();
+}
+
+/** Pipeline: run Agent 2 (KPI) then Agent 3 (RCA) sequentially with progress callback */
+export async function analyzeAll(
+  file: File,
+  onProgress: (step: 'kpi' | 'rca' | 'done', label: string) => void,
+): Promise<{ kpi: KPIResult; rca: RCAResult }> {
+  onProgress('kpi', 'Menganalisis KPI (Agent 2)...');
+  const kpi = await analyzeKPI(file);
+
+  onProgress('rca', 'Menjalankan Root Cause Analysis (Agent 3)...');
+  const rca = await analyzeRCA(file);
+
+  onProgress('done', 'Analisis selesai');
+  return { kpi, rca };
 }
 
 export async function checkHealth(agent: 'agent1' | 'agent2' | 'agent3'): Promise<{
