@@ -26,7 +26,7 @@ class SHAPAnalyzer:
         """Load data dan prepare features"""
         print("Loading data...")
         self.df = pd.read_csv(self.merged_data_path)
-        print(f"✓ Loaded: {self.df.shape}")
+        print(f"Loaded: {self.df.shape}")
         
         # Exclude non-numeric dan target columns
         exclude_cols = ['timestamp', 'defect_incident']
@@ -45,8 +45,8 @@ class SHAPAnalyzer:
         # Handle any remaining NaN
         self.X = self.X.fillna(self.X.mean())
         
-        print(f"✓ Features shape: {self.X.shape}")
-        print(f"✓ Target distribution:\n{self.y.value_counts()}")
+        print(f"Features shape: {self.X.shape}")
+        print(f"Target distribution:\n{self.y.value_counts()}")
         
         return self.X, self.y
     
@@ -82,7 +82,7 @@ class SHAPAnalyzer:
             verbose=False
         )
         
-        print("✓ Model trained")
+        print("Model trained")
         
         # Evaluate
         y_pred = self.model.predict(X_test)
@@ -114,7 +114,7 @@ class SHAPAnalyzer:
         # Calculate SHAP values
         self.shap_values = self.explainer.shap_values(self.X)
         
-        print("✓ SHAP values calculated")
+        print("SHAP values calculated")
         print(f"  Shape: {np.array(self.shap_values).shape}")
         
         return self.shap_values
@@ -173,10 +173,10 @@ class SHAPAnalyzer:
             shap.summary_plot(shap_vals, self.X, plot_type="bar", show=False)
             plt.tight_layout()
             plt.savefig(output_path / 'shap_summary_bar.png', dpi=100, bbox_inches='tight')
-            print("✓ Saved shap_summary_bar.png")
+            print("Saved shap_summary_bar.png")
             plt.close()
         except Exception as e:
-            print(f"⚠ Could not create summary bar plot: {e}")
+            print(f"! Could not create summary bar plot: {e}")
         
         # 2. Summary plot (beeswarm) - hanya top 10 features
         try:
@@ -193,10 +193,10 @@ class SHAPAnalyzer:
             )
             plt.tight_layout()
             plt.savefig(output_path / 'shap_summary_dot.png', dpi=100, bbox_inches='tight')
-            print("✓ Saved shap_summary_dot.png")
+            print("Saved shap_summary_dot.png")
             plt.close()
         except Exception as e:
-            print(f"⚠ Could not create summary dot plot: {e}")
+            print(f"! Could not create summary dot plot: {e}")
         
         # 3. Force plot untuk sample pertama
         try:
@@ -209,10 +209,10 @@ class SHAPAnalyzer:
             )
             plt.tight_layout()
             plt.savefig(output_path / 'shap_force_plot.png', dpi=100, bbox_inches='tight')
-            print("✓ Saved shap_force_plot.png")
+            print("Saved shap_force_plot.png")
             plt.close()
         except Exception as e:
-            print(f"⚠ Could not create force plot: {e}")
+            print(f"! Could not create force plot: {e}")
     
     def save_results(self, feature_importance, output_dir='data'):
         """
@@ -225,7 +225,7 @@ class SHAPAnalyzer:
         # Save feature importance
         importance_path = output_path / 'shap_feature_importance.csv'
         feature_importance.to_csv(importance_path, index=False)
-        print(f"✓ Saved {importance_path}")
+        print(f"Saved {importance_path}")
         
         # Save ranking as JSON
         ranking_path = output_path / 'shap_ranking.json'
@@ -234,12 +234,12 @@ class SHAPAnalyzer:
         }
         with open(ranking_path, 'w') as f:
             json.dump(ranking_dict, f, indent=2)
-        print(f"✓ Saved {ranking_path}")
+        print(f"Saved {ranking_path}")
         
         # Save model
         model_path = output_path / 'xgboost_model.json'
         self.model.get_booster().save_model(str(model_path))
-        print(f"✓ Saved {model_path}")
+        print(f"Saved {model_path}")
     
     def analyze(self):
         """

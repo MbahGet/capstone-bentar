@@ -22,7 +22,7 @@ class CorrelationAnalyzer:
         """Load merged dataset"""
         print("Loading merged dataset...")
         self.df = pd.read_csv(self.merged_data_path)
-        print(f"✓ Loaded: {self.df.shape}")
+        print(f"Loaded: {self.df.shape}")
         print(f"Columns: {list(self.df.columns)}")
     
     def identify_feature_types(self):
@@ -44,8 +44,8 @@ class CorrelationAnalyzer:
             if col not in exclude_cols
         ]
         
-        print(f"✓ Numeric features ({len(self.numeric_features)}): {self.numeric_features[:5]}...")
-        print(f"✓ Categorical features ({len(self.categorical_features)}): {self.categorical_features}")
+        print(f"Numeric features ({len(self.numeric_features)}): {self.numeric_features[:5]}...")
+        print(f"Categorical features ({len(self.categorical_features)}): {self.categorical_features}")
     
     def calculate_pearson_correlation(self):
         """
@@ -80,7 +80,7 @@ class CorrelationAnalyzer:
             reverse=True
         )
         
-        print(f"✓ Calculated Pearson for {len(pearson_results)} features")
+        print(f"Calculated Pearson for {len(pearson_results)} features")
         print("\nTop 5 Pearson correlations:")
         for feature, stats in pearson_sorted[:5]:
             print(f"  {feature}: {stats['correlation']:.4f} (p={stats['p_value']:.4f})")
@@ -121,7 +121,7 @@ class CorrelationAnalyzer:
             reverse=True
         )
         
-        print(f"✓ Calculated Spearman for {len(spearman_results)} features")
+        print(f"Calculated Spearman for {len(spearman_results)} features")
         print("\nTop 5 Spearman correlations:")
         for feature, stats in spearman_sorted[:5]:
             print(f"  {feature}: {stats['correlation']:.4f} (p={stats['p_value']:.4f})")
@@ -156,9 +156,9 @@ class CorrelationAnalyzer:
                     'significance': 'significant' if p_value < 0.05 else 'not significant'
                 }
             except Exception as e:
-                print(f"  ⚠ Skipped {feature}: {str(e)}")
+                print(f"  ! Skipped {feature}: {str(e)}")
         
-        print(f"✓ Calculated chi-square for {len(chi_square_results)} features")
+        print(f"Calculated chi-square for {len(chi_square_results)} features")
         if chi_square_results:
             print("\nChi-square results:")
             for feature, stats in chi_square_results.items():
@@ -215,7 +215,7 @@ class CorrelationAnalyzer:
             self.feature_importance['correlation_score'] > threshold
         ]
         
-        print(f"✓ Found {len(significant)} significant features")
+        print(f"Found {len(significant)} significant features")
         print(significant.to_string(index=False))
         
         return significant
@@ -246,7 +246,7 @@ class CorrelationAnalyzer:
         # Save
         output_path = Path(self.merged_data_path).parent / 'correlation_heatmap.png'
         plt.savefig(output_path, dpi=100)
-        print(f"✓ Heatmap saved to {output_path}")
+        print(f"Heatmap saved to {output_path}")
         plt.close()
         
         return corr_matrix
@@ -291,13 +291,13 @@ class CorrelationAnalyzer:
         with open(output_path, 'w') as f:
             json.dump(results_to_save, f, indent=2)
         
-        print(f"✓ Results saved to {output_path}")
+        print(f"Results saved to {output_path}")
         
         # Save feature importance
         importance_path = Path(output_dir) / 'feature_importance.csv'
         if self.feature_importance is not None:
             self.feature_importance.to_csv(importance_path, index=False)
-            print(f"✓ Feature importance saved to {importance_path}")
+            print(f"Feature importance saved to {importance_path}")
     
     def analyze(self):
         """
@@ -355,8 +355,8 @@ if __name__ == "__main__":
     try:
         analyzer = CorrelationAnalyzer(str(merged_path))
         feature_importance, significant = analyzer.analyze()
-        print("✓ Analysis complete!")
+        print("Analysis complete!")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
         import traceback
         traceback.print_exc()

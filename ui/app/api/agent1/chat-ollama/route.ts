@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// n8n webhook response format: { reply: "...", sessionId: "..." }
-// We normalise it to { response, agents_called, sources } for the UI.
 export async function POST(req: NextRequest) {
   const url = process.env.AGENT1_URL ?? 'http://localhost:5678';
   try {
@@ -17,7 +15,6 @@ export async function POST(req: NextRequest) {
     let raw: Record<string, unknown>;
     try { raw = JSON.parse(text); } catch { raw = { reply: text }; }
 
-    // Normalise n8n's "reply" field → "response"
     const normalised = {
       response: (raw.reply || raw.response || raw.output || 'Tidak ada respons.') as string,
       agents_called: (raw.agents_called ?? []) as string[],

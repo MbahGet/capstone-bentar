@@ -3,7 +3,7 @@ export interface FileAttachment {
   name: string;
   size: number;
   type: 'csv' | 'pdf';
-  file?: File;            // only on client before sending
+  file?: File;
 }
 
 export interface Message {
@@ -18,7 +18,6 @@ export interface Message {
   attachments?: FileAttachment[];
   kpiResult?: KPIResult;
   rcaResult?: RCAResult;
-  /** Pipeline progress label shown while agents are running */
   pipelineStatus?: string;
 }
 

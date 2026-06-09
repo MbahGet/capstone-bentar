@@ -21,7 +21,6 @@ export default function ChatWindow({ messages, onSend, isLoading, isReadOnly }: 
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-[#070a13]">
-      {/* Messages Area */}
       <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 flex flex-col gap-4">
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} />
@@ -29,7 +28,6 @@ export default function ChatWindow({ messages, onSend, isLoading, isReadOnly }: 
         <div ref={bottomRef} className="shrink-0 h-0" />
       </div>
 
-      {/* Input Area */}
       <div className="w-full shrink-0 bg-transparent">
         <ChatInput onSend={onSend} disabled={isLoading} isReadOnly={isReadOnly} />
       </div>

@@ -26,7 +26,7 @@ export default function ChatInput({ onSend, disabled, isReadOnly }: Props) {
     if ((!trimmed && !hasFiles) || disabled || isReadOnly) return;
 
     const files = attachedFiles.map((af) => af.file);
-    onSend(trimmed || `📎 ${attachedFiles.map((f) => f.file.name).join(', ')}`, files.length > 0 ? files : undefined);
+    onSend(trimmed || `${attachedFiles.map((f) => f.file.name).join(', ')}`, files.length > 0 ? files : undefined);
     setText('');
     setAttachedFiles([]);
     if (textRef.current) {
@@ -63,7 +63,6 @@ export default function ChatInput({ onSend, disabled, isReadOnly }: Props) {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
   }
 
-  /* Read-only state */
   if (isReadOnly) {
     return (
       <div className="shrink-0 p-3 bg-bg-primary border-t border-bd">
@@ -79,7 +78,6 @@ export default function ChatInput({ onSend, disabled, isReadOnly }: Props) {
 
   return (
     <div className="shrink-0 p-3 bg-bg-primary border-t border-bd">
-      {/* Attached files preview */}
       {attachedFiles.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
           {attachedFiles.map((af, i) => (
@@ -104,10 +102,8 @@ export default function ChatInput({ onSend, disabled, isReadOnly }: Props) {
         </div>
       )}
 
-      {/* Input row */}
       <div className="flex items-end gap-1.5 bg-bg-card border border-bd rounded-xl p-1.5 focus-within:border-blue-500/40 transition-all duration-200">
 
-        {/* Attach button */}
         <button
           onClick={() => fileRef.current?.click()}
           disabled={disabled}
@@ -125,7 +121,6 @@ export default function ChatInput({ onSend, disabled, isReadOnly }: Props) {
           onChange={handleFileChange}
         />
 
-        {/* Textarea */}
         <textarea
           ref={textRef}
           value={text}
@@ -145,7 +140,6 @@ export default function ChatInput({ onSend, disabled, isReadOnly }: Props) {
           }}
         />
 
-        {/* Send button */}
         <button
           onClick={handleSend}
           disabled={disabled || (!text.trim() && attachedFiles.length === 0)}

@@ -54,7 +54,7 @@ export async function analyzeRCA(file: File): Promise<RCAResult> {
   return res.json();
 }
 
-/** Pipeline: run Agent 2 (KPI) then Agent 3 (RCA) sequentially with progress callback */
+/** Pipeline Run: Agent 2 (KPI) then Agent 3 (RCA) */
 export async function analyzeAll(
   file: File,
   onProgress: (step: 'kpi' | 'rca' | 'done', label: string) => void,
@@ -101,5 +101,5 @@ export function writeActivityLog(entry: {
     const logs = JSON.parse(localStorage.getItem('bentar_logs') || '[]');
     logs.unshift({ ...entry, id: Date.now().toString(), timestamp: new Date().toISOString() });
     localStorage.setItem('bentar_logs', JSON.stringify(logs.slice(0, 100)));
-  } catch { /* localStorage may not be available */ }
+  } catch { }
 }

@@ -5,7 +5,6 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
 
   return (
     <div className="space-y-4">
-      {/* Summary */}
       <div className="grid grid-cols-3 gap-2">
         {[
           { label: 'Records', value: result.summary.total_records_analyzed.toLocaleString() },
@@ -19,11 +18,10 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
         ))}
       </div>
 
-      {/* Root causes */}
       <div className="rounded-xl border border-bd overflow-hidden">
         <div className="flex items-center justify-between px-3 py-2 border-b border-bd bg-bg-secondary">
           <div className="flex items-center gap-2">
-            <img src="/icons/magnifying.svg" className="w-[13px] h-[13px] invert opacity-80" alt="Search" />
+            <img src="/icons/magnifying.svg" className="w-3.25 h-3.25 invert opacity-80" alt="Search" />
             <span className="text-xs font-semibold text-slate-200">Akar Penyebab Utama</span>
           </div>
           <span className="text-[9px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
@@ -55,12 +53,11 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
         </div>
       </div>
 
-      {/* Explanation */}
       {result.explanation && (
         <div className="rounded-2xl border border-violet-500/30 bg-linear-to-r from-violet-950/15 via-indigo-950/15 to-blue-950/15 p-4 shadow-md relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
-              <img src="/icons/bot.svg" className="w-[14px] h-[14px] invert opacity-80" alt="Bot" />
+              <img src="/icons/bot.svg" className="w-3.5 h-3.5 invert opacity-80" alt="Bot" />
               <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
                 Narasi Analisis
               </span>

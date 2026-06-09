@@ -34,16 +34,14 @@ export default function HistorySidebar({ sessions, onSelect, onNewChat }: Props)
   return (
     <div className="flex flex-col h-full min-h-0">
 
-      {/* New Chat Button */}
       <button
         onClick={onNewChat}
         className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all duration-150"
       >
-        <img src="/icons/plus.svg" className="w-[14px] h-[14px] invert" alt="New Chat" />
+        <img src="/icons/plus.svg" className="w-3.5 h-3.5 invert" alt="New Chat" />
         Chat Baru
       </button>
 
-      {/* Session list */}
       <div className="flex-1 overflow-y-auto min-h-0 py-2 bg-bg-primary">
         {sessions.length === 0 ? (
           <div className="h-full flex items-center justify-center text-center">
@@ -53,7 +51,6 @@ export default function HistorySidebar({ sessions, onSelect, onNewChat }: Props)
           <div className="space-y-1">
             {groups.map(({ key, label, sessions: gs }) => (
               <div key={key}>
-                {/* Date label */}
                 <div className="px-4 pt-3 pb-1.5 flex items-center gap-2">
                   <span className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest">
                     {label}
@@ -74,14 +71,12 @@ export default function HistorySidebar({ sessions, onSelect, onNewChat }: Props)
                     >
                       <div className="flex items-start gap-2">
                         <div className="w-5 h-5 rounded-lg bg-bd flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-600/20 group-hover:border-blue-500/30 border border-transparent transition-all">
-                          <img src="/icons/chat.svg" className="w-[10px] h-[10px] invert opacity-60 group-hover:opacity-100 transition-all" alt="Chat" />
+                          <img src="/icons/chat.svg" className="w-2.5 h-2.5 invert opacity-60 group-hover:opacity-100 transition-all" alt="Chat" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          {/* First question preview */}
                           <p className="text-xs text-slate-500 group-hover:text-slate-200 transition-colors leading-snug line-clamp-2 font-medium">
                             {preview}
                           </p>
-                          {/* Description */}
                           <div className="flex items-center gap-1.5 mt-1.5">
                             <span className="text-[10px] text-slate-700 font-mono tabular-nums">
                               {formatHistoryTimestamp(s.startedAt)}
@@ -97,7 +92,6 @@ export default function HistorySidebar({ sessions, onSelect, onNewChat }: Props)
           </div>
         )}
       </div>
-
     </div>
   );
 }

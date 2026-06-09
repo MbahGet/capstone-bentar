@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
 import { KPIResult, RCAResult } from '@/lib/types';
 import KPICard from '@/components/kpi/KPICard';
 import AlertList from '@/components/kpi/AlertList';
 import DeviationTable from '@/components/kpi/DeviationTable';
 import RCAResultPanel from '@/components/rca/RCAResult';
-import { LayoutDashboard, Activity, Zap, Cpu } from 'lucide-react';
 
 interface Props {
   kpiResult?: KPIResult;
@@ -21,11 +19,9 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
 
   return (
     <div className="h-full flex flex-col bg-[#0b0f19] border-l border-bd overflow-hidden">
-      {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
         {hasData ? (
           <div className="space-y-6 max-w-4xl mx-auto">
-            {/* KPI Section */}
             {kpiResult && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
@@ -80,7 +76,7 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
                   <div className="rounded-2xl border border-violet-500/30 bg-linear-to-r from-violet-950/15 via-indigo-950/15 to-blue-950/15 p-4 shadow-md relative overflow-hidden">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1.5">
-                        <img src="/icons/bot.svg" className="w-[14px] h-[14px] invert opacity-80" alt="Bot" />
+                        <img src="/icons/bot.svg" className="w-3.5 h-3.5 invert opacity-80" alt="Bot" />
                         <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
                           Rekomendasi Solusi AI (Generative RAG)
                         </span>
@@ -97,7 +93,6 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
               </div>
             )}
 
-            {/* RCA Section */}
             {rcaResult && (
               <div className="space-y-4 border-t border-bd pt-6">
                 <div className="flex items-center gap-2">
@@ -111,9 +106,7 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
             )}
           </div>
         ) : (
-          /* Placeholder / Presentation / Demo Scenario Cards (Neat & Clean Grid on Dashboard) */
           <div className="max-w-4xl mx-auto py-12 px-4 flex flex-col items-center justify-center space-y-10">
-            {/* Header Banner */}
             <div className="text-center space-y-3">
               <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl bg-linear-to-r from-blue-400 via-indigo-200 to-emerald-400 bg-clip-text">
                 FactoryOps AI Platform
@@ -123,18 +116,15 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
               </p>
             </div>
 
-            {/* Skenario / Demo Cards */}
-            <div className="w-full">
-              
+            <div className="w-full">              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Simulasi Pipeline */}
                 <button
                   onClick={onSimulateDemo}
                   disabled={isLoading}
                   className="flex flex-col text-left p-5 rounded-2xl bg-bg-secondary/60 border border-bd hover:border-emerald-500/50 hover:bg-[#141c38]/80 transition-all duration-300 group shadow-md hover:shadow-emerald-500/5"
                 >
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300">
-                    <img src="/icons/pipeline-run.svg" className="w-[18px] h-[18px] invert opacity-80 group-hover:opacity-100 transition-all" alt="Pipeline" />
+                    <img src="/icons/pipeline-run.svg" className="w-3.5 h-3.5 invert opacity-80 group-hover:opacity-100 transition-all" alt="Pipeline" />
                   </div>
                   <h4 className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                     Skenario 1: Simulasi Pipeline
@@ -147,14 +137,13 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
                   </div>
                 </button>
 
-                {/* Tanya SOP */}
                 <button
                   onClick={() => onSendPrompt("Tampilkan isi SOP terkait Hydraulic Pressure.")}
                   disabled={isLoading}
                   className="flex flex-col text-left p-5 rounded-2xl bg-bg-secondary/60 border border-bd hover:border-blue-500/50 hover:bg-[#141c38]/80 transition-all duration-300 group shadow-md hover:shadow-blue-500/5"
                 >
                   <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300">
-                    <img src="/icons/pdf-document.svg" className="w-[18px] h-[18px] invert opacity-80 group-hover:opacity-100 transition-all" alt="PDF Document" />
+                    <img src="/icons/pdf-document.svg" className="w-4.5 h-4.5 invert opacity-80 group-hover:opacity-100 transition-all" alt="PDF Document" />
                   </div>
                   <h4 className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">
                     Skenario 2: Tanya SOP (RAG)
@@ -167,14 +156,13 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
                   </div>
                 </button>
 
-                {/* Arsitektur Kolaborasi */}
                 <button
                   onClick={() => onSendPrompt("Secara teori, bagaimana arsitektur multi-agent (Orchestrator, KPI Analyst, dan RCA Analyst) saling berkolaborasi?")}
                   disabled={isLoading}
                   className="flex flex-col text-left p-5 rounded-2xl bg-bg-secondary/60 border border-bd hover:border-violet-500/50 hover:bg-[#141c38]/80 transition-all duration-300 group shadow-md hover:shadow-violet-500/5"
                 >
                   <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300">
-                    <img src="/icons/blueprint.svg" className="w-[18px] h-[18px] invert opacity-80 group-hover:opacity-100 transition-all" alt="Blueprint" />
+                    <img src="/icons/blueprint.svg" className="w-4.5 h-4.5 invert opacity-80 group-hover:opacity-100 transition-all" alt="Blueprint" />
                   </div>
                   <h4 className="text-sm font-semibold text-white group-hover:text-violet-400 transition-colors">
                     Skenario 3: Penjelasan Arsitektur
@@ -189,7 +177,6 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
               </div>
             </div>
 
-            {/* Workflow Step Indicator */}
             <div className="w-full bg-bg-secondary/40 border border-bd rounded-2xl p-5 text-left space-y-4">
               <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block border-b border-bd pb-1.5">
                 Alur Kerja & Pembagian Agen

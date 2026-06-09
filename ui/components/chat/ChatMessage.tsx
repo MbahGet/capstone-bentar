@@ -59,7 +59,6 @@ function TeaserDashboardCard() {
   );
 }
 
-/* ─── Markdown prose renderer ─────────────────────────────────────────────── */
 function MarkdownContent({ content }: { content: string }) {
   return (
     <ReactMarkdown
@@ -108,7 +107,6 @@ function MarkdownContent({ content }: { content: string }) {
   );
 }
 
-/* ─── File attachment pills (user messages) ──────────────────────────────── */
 function AttachmentPills({ attachments }: { attachments: NonNullable<Message['attachments']> }) {
   return (
     <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -125,7 +123,6 @@ function AttachmentPills({ attachments }: { attachments: NonNullable<Message['at
   );
 }
 
-/* ─── Main component ─────────────────────────────────────────────────────── */
 export default function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === 'user';
 

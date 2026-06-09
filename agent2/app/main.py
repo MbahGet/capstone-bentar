@@ -7,11 +7,9 @@ from pathlib import Path
 from typing import AsyncIterator
 from pydantic import BaseModel
 
-# ── make sure the app/ folder is always on sys.path ──────────────────────────
 APP_DIR = Path(__file__).resolve().parent
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
-# ─────────────────────────────────────────────────────────────────────────────
 
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile

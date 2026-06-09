@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// n8n webhook path is /webhook/upload-ollama
 export async function POST(req: NextRequest) {
-  const url = process.env.AGENT1_URL ?? 'http://localhost:5678'; // use 5678 default to match env config
+  const url = process.env.AGENT1_URL ?? 'http://localhost:5678';
   try {
     const formData = await req.formData();
     const res = await fetch(`${url}/webhook/upload-ollama`, {
@@ -10,7 +9,6 @@ export async function POST(req: NextRequest) {
       body: formData,
       signal: AbortSignal.timeout(60000),
     });
-    // n8n may respond with non-JSON on success — handle both
     const text = await res.text();
     let data: unknown;
     try { data = JSON.parse(text); } catch { data = { success: true, raw: text }; }

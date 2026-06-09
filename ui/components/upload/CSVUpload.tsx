@@ -28,7 +28,6 @@ export default function CSVUpload({ label, description, onAnalyze, loading }: Pr
 
   return (
     <div className="space-y-2">
-      {/* File picker row */}
       <button
         onClick={() => !loading && inputRef.current?.click()}
         disabled={loading}
@@ -59,7 +58,6 @@ export default function CSVUpload({ label, description, onAnalyze, loading }: Pr
         )}
       </button>
 
-      {/* Submit button — always visible, disabled until a file is staged */}
       <button
         onClick={handleSubmit}
         disabled={!pendingFile || loading}

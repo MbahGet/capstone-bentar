@@ -147,7 +147,7 @@ async def analyze_rca(
         merged_df = preprocessor.preprocess()
         merged_path = temp_dir / "merged_dataset.csv"
         preprocessor.save_processed_data(str(merged_path))
-        print("[RCA] ✓ Preprocessing complete")
+        print("[RCA] Preprocessing complete")
         
         # Step 2: Correlation Analysis
         print("\n[RCA] Step 2: Correlation Analysis...")
@@ -160,7 +160,7 @@ async def analyze_rca(
         analyzer.rank_features_by_correlation()
         analyzer.create_correlation_matrix()
         analyzer.save_results(str(temp_dir))
-        print("[RCA] ✓ Correlation analysis complete")
+        print("[RCA] Correlation analysis complete")
         
         # Step 3: SHAP Analysis
         print("\n[RCA] Step 3: SHAP Analysis...")
@@ -171,7 +171,7 @@ async def analyze_rca(
         feature_importance = shap_analyzer.rank_features_by_shap()
         shap_analyzer.create_shap_visualizations(str(temp_dir))
         shap_analyzer.save_results(feature_importance, str(temp_dir))
-        print("[RCA] ✓ SHAP analysis complete")
+        print("[RCA] SHAP analysis complete")
         
         # Step 4: LLM Explanation
         print("\n[RCA] Step 4: LLM Explanation Generation...")
@@ -181,7 +181,7 @@ async def analyze_rca(
         explanation = explainer.generate_explanation()
         explainer.save_explanation(str(temp_dir / "rca_explanation.txt"))
         explainer.create_summary_json(str(temp_dir / "rca_result.json"))
-        print("[RCA] ✓ LLM explanation complete")
+        print("[RCA] LLM explanation complete")
         
         # Prepare response
         print("\n[RCA] Preparing response...")
@@ -215,11 +215,11 @@ async def analyze_rca(
             }
         }
         
-        print("[RCA] ✓ Response prepared")
+        print("[RCA] Response prepared")
         return JSONResponse(content=response_data, status_code=200)
     
     except Exception as e:
-        print(f"\n[RCA] ❌ Error: {str(e)}")
+        print(f"\n[RCA] Error: {str(e)}")
         import traceback
         traceback.print_exc()
         
