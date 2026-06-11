@@ -1,8 +1,5 @@
 import { KPIResult, RCAResult } from './types';
 
-/**
- * Static mock data used by the "Simulasi Pipeline" demo scenario.
- */
 export const DEMO_KPI: KPIResult = {
   summary: {
     avg_oee: 68.5,

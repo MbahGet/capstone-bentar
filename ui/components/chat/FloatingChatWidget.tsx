@@ -74,12 +74,12 @@ export default function FloatingChatWidget({
 
             <div className="flex items-center gap-2 bg-bg-card px-2.5 py-1 rounded-lg border border-bd">
               {(['agent1', 'agent2', 'agent3'] as const).map((key) => {
-                const h   = agentHealth[key];
+                const h = agentHealth[key];
                 const num = key.replace('agent', '');
                 const dot =
                   h.status === 'online'   ? 'bg-emerald-500 animate-pulse' :
-                  h.status === 'checking' ? 'bg-amber-500'                 :
-                  h.status === 'offline'  ? 'bg-rose-500'                  : 'bg-slate-500';
+                  h.status === 'checking' ? 'bg-amber-500' :
+                  h.status === 'offline'  ? 'bg-rose-500' : 'bg-slate-500';
                 return (
                   <div
                     key={key}

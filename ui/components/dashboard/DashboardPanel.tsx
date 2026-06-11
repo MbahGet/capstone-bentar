@@ -81,9 +81,6 @@ export default function DashboardPanel({ kpiResult, rcaResult, onSimulateDemo, o
                           Rekomendasi Solusi AI (Generative RAG)
                         </span>
                       </div>
-                      <span className="text-[9px] bg-violet-500/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
-                        Agent 1 + 2 Collaboration
-                      </span>
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
                       {kpiResult.recommendation.text}

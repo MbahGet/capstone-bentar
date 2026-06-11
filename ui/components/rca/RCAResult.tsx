@@ -24,9 +24,6 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
             <img src="/icons/magnifying.svg" className="w-3.25 h-3.25 invert opacity-80" alt="Search" />
             <span className="text-xs font-semibold text-slate-200">Akar Penyebab Utama</span>
           </div>
-          <span className="text-[9px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
-            Explainable AI (SHAP)
-          </span>
         </div>
         <div className="p-3 space-y-2">
           {result.root_causes.slice(0, 6).map((rc) => {
@@ -62,9 +59,6 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
                 Narasi Analisis
               </span>
             </div>
-            <span className="text-[9px] bg-violet-500/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
-              LLM Reasoning
-            </span>
           </div>
           <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
             {result.explanation}

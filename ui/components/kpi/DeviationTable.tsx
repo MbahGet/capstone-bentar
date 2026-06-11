@@ -9,9 +9,6 @@ export default function DeviationTable({ deviations }: { deviations: Deviation[]
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-slate-200">Top Deviasi</span>
         </div>
-        <span className="text-[9px] bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-md font-mono uppercase font-bold tracking-wider">
-          Anomaly Detection (ML)
-        </span>
       </div>
       <div className="divide-y divide-bd">
         {deviations.slice(0, 5).map((d, i) => (

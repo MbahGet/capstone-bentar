@@ -68,7 +68,6 @@ export interface UseChatSessionReturn {
   archiveLabel: string;
   latestKPI: KPIResult | undefined;
   latestRCA: RCAResult | undefined;
-
   handleSend: (content: string, files?: File[]) => Promise<void>;
   handleSimulateDemo: (onOpen: () => void) => void;
   handleSendPrompt: (prompt: string, onOpen: () => void) => void;
@@ -78,12 +77,12 @@ export interface UseChatSessionReturn {
 }
 
 export function useChatSession(): UseChatSessionReturn {
-  const [sessions,        setSessions]      = useState<ChatSession[]>([]);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState('');
-  const [messages,        setMessages]      = useState<Message[]>([makeWelcome()]);
-  const [loading,         setLoading]       = useState(false);
-  const [isReadOnly,      setIsReadOnly]    = useState(false);
-  const [archiveLabel,    setArchiveLabel]  = useState('');
+  const [messages, setMessages] = useState<Message[]>([makeWelcome()]);
+  const [loading, setLoading] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  const [archiveLabel, setArchiveLabel] = useState('');
 
   const latestKPI = [...messages].reverse().find((m) => m.kpiResult)?.kpiResult;
   const latestRCA = [...messages].reverse().find((m) => m.rcaResult)?.rcaResult;
@@ -128,8 +127,8 @@ export function useChatSession(): UseChatSessionReturn {
     }
   }, [startNewSession]);
 
-  const handleNewChat       = startNewSession;
-  const handleReturnToLive  = startNewSession;
+  const handleNewChat = startNewSession;
+  const handleReturnToLive = startNewSession;
 
   const handleSelectHistory = useCallback((session: ChatSession) => {
     setMessages(restoreMessages(session));
@@ -145,38 +144,42 @@ export function useChatSession(): UseChatSessionReturn {
 
     const csvFiles = files?.filter((f) => f.name.toLowerCase().endsWith('.csv')) ?? [];
     const pdfFiles = files?.filter((f) => f.name.toLowerCase().endsWith('.pdf')) ?? [];
-    const hasCSV   = csvFiles.length > 0;
-    const hasPDF   = pdfFiles.length > 0;
-    const hasText  = content.trim().length > 0;
+    const hasCSV = csvFiles.length > 0;
+    const hasPDF = pdfFiles.length > 0;
+    const hasText = content.trim().length > 0;
 
     const attachments: FileAttachment[] = (files ?? []).map((f) => ({
-      id:   `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: f.name,
       size: f.size,
       type: f.name.toLowerCase().endsWith('.csv') ? 'csv' : 'pdf',
     }));
 
     const userMsg: Message = {
-      id:          Date.now().toString(),
-      role:        'user',
+      id: Date.now().toString(),
+      role: 'user',
       content,
-      timestamp:   new Date(),
+      timestamp: new Date(),
       attachments: attachments.length > 0 ? attachments : undefined,
     };
 
-    const loadId  = (Date.now() + 1).toString();
+    const loadId = (Date.now() + 1).toString();
     const loadMsg: Message = {
-      id: loadId, role: 'assistant', content: '', timestamp: new Date(), isLoading: true,
+      id: loadId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isLoading: true,
     };
 
-    const current   = loadChatHistory();
-    const existing  = current.find((s) => s.id === activeSessionId);
+    const current = loadChatHistory();
+    const existing = current.find((s) => s.id === activeSessionId);
     const startedAt = existing?.startedAt ?? new Date().toISOString();
     const histMsgs: HistoryMessage[] = existing ? [...existing.messages] : [];
     histMsgs.push({
-      role:        'user',
+      role: 'user',
       content,
-      timestamp:   userMsg.timestamp.toISOString(),
+      timestamp: userMsg.timestamp.toISOString(),
       attachments: attachments.length > 0 ? attachments : undefined,
     });
 
@@ -194,12 +197,12 @@ export function useChatSession(): UseChatSessionReturn {
 
       let assistantContent = '';
       let agentsCalled: string[] = [];
-      let sources:      string[] = [];
-      let kpiResult:    KPIResult | undefined;
-      let rcaResult:    RCAResult | undefined;
+      let sources: string[] = [];
+      let kpiResult: KPIResult | undefined;
+      let rcaResult: RCAResult | undefined;
 
       if (hasCSV) {
-        const csvFile   = csvFiles[0];
+        const csvFile = csvFiles[0];
         const onProgress = (_step: string, label: string) =>
           setMessages((prev) => prev.map((m) => m.id === loadId ? { ...m, pipelineStatus: label } : m));
 
@@ -214,12 +217,12 @@ export function useChatSession(): UseChatSessionReturn {
           ? `PDF berhasil diupload ke basis pengetahuan. Berikut hasil analisis CSV **${csvFile.name}**:`
           : `Berikut hasil analisis CSV **${csvFile.name}**:`;
         agentsCalled = ['agent2', 'agent3'];
-        kpiResult    = kpi;
-        rcaResult    = rca;
+        kpiResult = kpi;
+        rcaResult = rca;
 
       } else if (hasText) {
         const start = Date.now();
-        const data  = await sendChat(content);
+        const data = await sendChat(content);
         const latency = Date.now() - start;
         writeActivityLog({ agent: 'agent1', method: 'POST', endpoint: '/webhook/chat', statusCode: 200, latency });
 
@@ -227,34 +230,57 @@ export function useChatSession(): UseChatSessionReturn {
           ? `PDF berhasil diupload. ${data.response ?? ''}`
           : (data.response ?? 'Tidak ada respons.');
         agentsCalled = data.agents_called ?? [];
-        sources      = data.sources ?? [];
+        sources = data.sources ?? [];
 
       } else if (hasPDF) {
         assistantContent = `✅ ${pdfFiles.length} PDF berhasil diupload ke basis pengetahuan Agent 1. Anda sekarang bisa bertanya tentang isi dokumen tersebut.`;
-        agentsCalled     = ['agent1'];
+        agentsCalled = ['agent1'];
       }
 
       const assistantMsg: Message = {
-        id: loadId, role: 'assistant', content: assistantContent,
-        agentsCalled, sources, timestamp: new Date(), isLoading: false, kpiResult, rcaResult,
+        id: loadId,
+        role: 'assistant',
+        content: assistantContent,
+        agentsCalled,
+        sources,
+        timestamp: new Date(),
+        isLoading: false,
+        kpiResult,
+        rcaResult,
       };
       setMessages((prev) => prev.map((m) => (m.id === loadId ? assistantMsg : m)));
       saveSession(activeSessionId, startedAt, [
         ...histMsgs,
-        { role: 'assistant', content: assistantContent, timestamp: assistantMsg.timestamp.toISOString(), agentsCalled, sources, kpiResult, rcaResult },
+        {
+          role: 'assistant',
+          content: assistantContent,
+          timestamp: assistantMsg.timestamp.toISOString(),
+          agentsCalled,
+          sources,
+          kpiResult,
+          rcaResult,
+        },
       ]);
 
     } catch (err) {
       console.error(err);
       const errMsg: Message = {
-        id: loadId, role: 'assistant',
+        id: loadId,
+        role: 'assistant',
         content: 'Gagal memproses permintaan. Pastikan semua agent sudah berjalan.',
-        timestamp: new Date(), isLoading: false, isError: true,
+        timestamp: new Date(),
+        isLoading: false,
+        isError: true,
       };
       setMessages((prev) => prev.map((m) => (m.id === loadId ? errMsg : m)));
       saveSession(activeSessionId, startedAt, [
         ...histMsgs,
-        { role: 'assistant', content: errMsg.content, timestamp: errMsg.timestamp.toISOString(), isError: true },
+        {
+          role: 'assistant',
+          content: errMsg.content,
+          timestamp: errMsg.timestamp.toISOString(),
+          isError: true,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -265,28 +291,34 @@ export function useChatSession(): UseChatSessionReturn {
     if (!activeSessionId) return;
     onOpen();
 
-    const now     = new Date();
+    const now = new Date();
     const userMsg: Message = {
-      id:        `demo-user-${Date.now()}`,
-      role:      'user',
-      content:   'Simulasikan analisis data mesin pabrik (Data Sensor Lini 2)',
+      id: `demo-user-${Date.now()}`,
+      role: 'user',
+      content: 'Simulasikan analisis data mesin pabrik (Data Sensor Lini 2)',
       timestamp: now,
       attachments: [{ id: 'demo-csv', name: 'integrated_sensor_line2_oee.csv', size: 15420, type: 'csv' }],
     };
 
-    const loadId  = `demo-load-${Date.now()}`;
+    const loadId = `demo-load-${Date.now()}`;
     const loadMsg: Message = {
-      id: loadId, role: 'assistant', content: '', timestamp: now,
-      isLoading: true, pipelineStatus: 'Mempersiapkan data demo...',
+      id: loadId,
+      role: 'assistant',
+      content: '',
+      timestamp: now,
+      isLoading: true,
+      pipelineStatus: 'Mempersiapkan data demo...',
     };
 
-    const current   = loadChatHistory();
-    const existing  = current.find((s) => s.id === activeSessionId);
+    const current = loadChatHistory();
+    const existing = current.find((s) => s.id === activeSessionId);
     const startedAt = existing?.startedAt ?? now.toISOString();
     const histMsgs: HistoryMessage[] = existing ? [...existing.messages] : [];
     histMsgs.push({
-      role: 'user', content: userMsg.content,
-      timestamp: now.toISOString(), attachments: userMsg.attachments,
+      role: 'user',
+      content: userMsg.content,
+      timestamp: now.toISOString(),
+      attachments: userMsg.attachments,
     });
 
     setMessages((prev) => [...prev, userMsg, loadMsg]);
@@ -301,21 +333,26 @@ export function useChatSession(): UseChatSessionReturn {
 
     setTimeout(() => {
       const resultMsg: Message = {
-        id: loadId, role: 'assistant',
-        content:      'Berikut adalah hasil simulasi analisis data sensor pabrik terintegrasi untuk Lini 2:',
+        id: loadId,
+        role: 'assistant',
+        content: 'Berikut adalah hasil simulasi analisis data sensor pabrik terintegrasi untuk Lini 2:',
         agentsCalled: ['agent2', 'agent3'],
-        timestamp:    new Date(), isLoading: false,
-        kpiResult:    DEMO_KPI,
-        rcaResult:    DEMO_RCA,
+        timestamp: new Date(),
+        isLoading: false,
+        kpiResult: DEMO_KPI,
+        rcaResult: DEMO_RCA,
       };
       setMessages((prev) => prev.map((m) => (m.id === loadId ? resultMsg : m)));
       setLoading(false);
       saveSession(activeSessionId, startedAt, [
         ...histMsgs,
         {
-          role: 'assistant', content: resultMsg.content,
+          role: 'assistant',
+          content: resultMsg.content,
           timestamp: resultMsg.timestamp.toISOString(),
-          agentsCalled: resultMsg.agentsCalled, kpiResult: DEMO_KPI, rcaResult: DEMO_RCA,
+          agentsCalled: resultMsg.agentsCalled,
+          kpiResult: DEMO_KPI,
+          rcaResult: DEMO_RCA,
         },
       ]);
     }, 3600);
@@ -327,9 +364,18 @@ export function useChatSession(): UseChatSessionReturn {
   }, [handleSend]);
 
   return {
-    sessions, messages, loading, isReadOnly, archiveLabel,
-    latestKPI, latestRCA,
-    handleSend, handleSimulateDemo, handleSendPrompt,
-    handleNewChat, handleSelectHistory, handleReturnToLive,
+    sessions,
+    messages,
+    loading,
+    isReadOnly,
+    archiveLabel,
+    latestKPI,
+    latestRCA,
+    handleSend,
+    handleSimulateDemo,
+    handleSendPrompt,
+    handleNewChat,
+    handleSelectHistory,
+    handleReturnToLive,
   };
 }
