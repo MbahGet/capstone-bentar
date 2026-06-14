@@ -1,0 +1,67 @@
+stages:
+  - build
+  - deploy
+variables:
+  IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+.build_template: &build_template
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  only:
+    - main
+
+build:ui:
+  <<: *build_template
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/ui:$IMAGE_TAG" -t "$CI_REGISTRY_IMAGE/ui:latest" ./ui
+    - docker push "$CI_REGISTRY_IMAGE/ui:$IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/ui:latest"
+
+build:agent2:
+  <<: *build_template
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/agent2:$IMAGE_TAG" -t "$CI_REGISTRY_IMAGE/agent2:latest" ./agent2
+    - docker push "$CI_REGISTRY_IMAGE/agent2:$IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/agent2:latest"
+
+build:agent3:
+  <<: *build_template
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/agent3:$IMAGE_TAG" -t "$CI_REGISTRY_IMAGE/agent3:latest" ./agent3
+    - docker push "$CI_REGISTRY_IMAGE/agent3:$IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/agent3:latest"
+
+deploy:production:
+  stage: deploy
+  image: alpine:3.19
+  only:
+    - main
+  when: manual
+  before_script:
+    - apk add --no-cache openssh-client rsync
+    - eval $(ssh-agent -s)
+    - chmod 600 "$SSH_PRIVATE_KEY"
+    - ssh-add "$SSH_PRIVATE_KEY"
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+  script:
+    - rsync -avz docker-compose.prod.yml "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/docker-compose.yml"
+    - |
+      ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+        cd $DEPLOY_PATH &&
+        echo '$CI_REGISTRY_PASSWORD' | docker login -u '$CI_REGISTRY_USER' --password-stdin '$CI_REGISTRY' &&
+        export REGISTRY_IMAGE='$CI_REGISTRY_IMAGE' &&
+        export GROQ_API_KEY='$GROQ_API_KEY' &&
+        docker compose pull &&
+        docker compose up -d --remove-orphans &&
+        docker image prune -f
+      "
+  environment:
+    name: production
+    url: http://$DEPLOY_HOST:3000

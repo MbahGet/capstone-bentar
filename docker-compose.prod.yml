@@ -1,0 +1,79 @@
+name: factoryops-prod
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: "6334"
+
+  agent1:
+    image: n8nio/n8n:latest
+    container_name: agent1
+    restart: unless-stopped
+    ports:
+      - "5680:5680"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5680
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - qdrant
+      - agent2
+      - agent3
+
+  agent2:
+    image: ${REGISTRY_IMAGE}/agent2:latest
+    container_name: agent2
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/agent2:/app/data
+    environment:
+      PYTHONUNBUFFERED: "1"
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+    depends_on:
+      - qdrant
+
+  agent3:
+    image: ${REGISTRY_IMAGE}/agent3:latest
+    container_name: agent3
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./data/agent3:/app/data
+    environment:
+      PYTHONUNBUFFERED: "1"
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+    depends_on:
+      - qdrant
+
+  ui:
+    image: ${REGISTRY_IMAGE}/ui:latest
+    container_name: ui
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      AGENT1_URL: http://agent1:5680
+      AGENT2_URL: http://agent2:8000
+      AGENT3_URL: http://agent3:9000
+    depends_on:
+      - agent1
+      - agent2
+      - agent3
+
+volumes:
+  qdrant_storage:
+  n8n_data:
