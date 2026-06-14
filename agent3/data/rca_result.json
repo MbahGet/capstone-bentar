@@ -1,0 +1,33 @@
+{
+  "analysis_type": "Root Cause Analysis (RCA)",
+  "method": "SHAP-based ML + LLM Reasoning",
+  "top_root_causes": [
+    {
+      "rank": 1,
+      "feature": "total_downtime_minutes",
+      "importance_score": 5.053144931793213
+    },
+    {
+      "rank": 2,
+      "feature": "temperature",
+      "importance_score": 1.0379137992858887
+    },
+    {
+      "rank": 3,
+      "feature": "vibration",
+      "importance_score": 0.848786473274231
+    },
+    {
+      "rank": 4,
+      "feature": "load",
+      "importance_score": 0.008443634025752544
+    },
+    {
+      "rank": 5,
+      "feature": "current",
+      "importance_score": 0.007967489771544933
+    }
+  ],
+  "full_explanation": "**LAPORAN ANALISIS ROOT CAUSE**\n\n**Identifikasi Penyebab Utama**\n\nBerdasarkan ranking SHAP values, tiga penyebab utama defects dalam sistem produksi adalah:\n\n1. **Total Downtime Minutes (5.0531)**: Faktor ini menunjukkan bahwa waktu downtime mesin yang lama memiliki dampak besar terhadap defect incidents. Waktu downtime yang lama dapat menyebabkan mesin menjadi aus dan tidak berfungsi dengan baik, sehingga meningkatkan kemungkinan defect.\n2. **Suhu (1.0379)**: Suhu yang tidak tepat juga dapat mempengaruhi kinerja mesin dan produk yang dihasilkan. Suhu yang terlalu tinggi atau terlalu rendah dapat menyebabkan deformasi, korosi, atau kerusakan pada material.\n3. **Vibration (0.8488)**: Vibration yang berlebihan juga dapat mempengaruhi kinerja mesin dan produk yang dihasilkan. Vibration yang kuat dapat menyebabkan debu dan partikel kecil terbawa, sehingga mengganggu kualitas produk.\n\n**Analisis Fishbone (Ishikawa Diagram)**\n\nBerdasarkan ranking SHAP values, kita dapat kategorisasi penyebab defect ke dalam kategori tradisional:\n\n* **Man (Manusia)**:\n + Masalah operator: kesalahan manusia dalam pengoperasian mesin\n + Training: kurangnya pelatihan yang memadai untuk operator\n* **Machine (Mesin)**:\n + Kondisi mesin: aus, rusak, atau tidak berfungsi dengan baik\n + Maintenance: kurangnya perawatan rutin dan scheduled maintenance\n + Wear & tear: degradasi kondisi mesin karena waktu operasional yang lama\n* **Material (Material)**:\n + Kualitas material: buruknya kualitas bahan baku\n + Spesifikasi: tidak sesuai dengan spesifikasi produksi\n* **Method (Metode)**:\n + Prosedur: tidak adanya prosedur operasional yang jelas dan terstruktur\n + SOP (Sistem Operasional): kurangnya implementasi sistem operasional yang efektif\n* **Environment (Lingkungan)**:\n + Kondisi tempat kerja: kondisi lingkungan kerja yang tidak seimbang atau tidak aman\n + Suhu dan kelembaban: suhu dan kelembaban yang tidak tepat dapat mempengaruhi kinerja mesin dan produk\n\n**Rekomendasi Tindakan**\n\nBerdasarkan analisis di atas, rekomendasi tindakan konkret adalah:\n\n1. **Optimalkan sistem perawatan rutin**: Mengoptimalkan jadwal maintenance dan perawatan rutin untuk memastikan mesin tetap berfungsi dengan baik.\n2. **Perbaiki kondisi lingkungan kerja**: Meningkatkan kenyamanan dan keselamatan tempat kerja, serta memastikan suhu dan kelembaban yang sesuai untuk operasional mesin.\n3. **Mengembangkan sistem pelatihan operator**: Menghadirkan pelatihan yang lebih menyeluruh dan rutin bagi operator untuk meningkatkan keterampilan dan kesadaran dalam pengoperasian mesin.\n\n**Timeline Implementasi**\n\n* Bulan ini: Optimalkan sistem perawatan rutin\n* 2 bulan ke depan: Perbaiki kondisi lingkungan kerja\n* 3 bulan ke depan: Mengembangkan sistem pelatihan operator\n\n**Format Output**\n\nLaporan analisis root cause akan disajikan dalam format yang jelas dan mudah dipahami, seperti berikut:\n\n| **Penyebab Utama** | **SHAP Value** |\n| --- | --- |\n| Total Downtime Minutes | 5.0531 |\n| Suhu | 1.0379 |\n| Vibration | 0.8488 |\n\n| **Kategori Penyebab** | **Penyebab Spesifik** |\n| --- | --- |\n| Man (Manusia) | Masalah operator, training |\n| Machine (Mesin) | Kondisi mesin, maintenance, wear & tear |\n| Material (Material) | Kualitas material, spesifikasi |\n| Method (Metode) | Prosedur, SOP |\n| Environment (Lingkungan) | Kondisi tempat kerja, suhu, kelembaban |\n\n**Rekomendasi Tindakan**\n\n1. Optimalkan sistem perawatan rutin\n2. Perbaiki kondisi lingkungan kerja\n3. Mengembangkan sistem pelatihan operator",
+  "status": "complete"
+}

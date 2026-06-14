@@ -4,6 +4,7 @@ export async function POST(req: NextRequest) {
   const url = process.env.AGENT2_URL ?? 'http://localhost:8000';
   try {
     const formData = await req.formData();
+    /* model_preference is already in formData — forwarded as-is to the agent */
     const res = await fetch(`${url}/analyze`, {
       method: 'POST',
       body: formData,

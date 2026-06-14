@@ -28,10 +28,11 @@ export default function CSVUpload({ label, description, onAnalyze, loading }: Pr
 
   return (
     <div className="space-y-2">
+      {/* File picker row */}
       <button
         onClick={() => !loading && inputRef.current?.click()}
         disabled={loading}
-        className="flex items-center gap-3 w-full rounded-xl border border-bd bg-bg-card hover:border-blue-500/50 hover:bg-bg-hover transition-all px-3 py-2.5 text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        className="flex items-center gap-3 w-full rounded-xl border border-[#1e2d4a] bg-[#141c2e] hover:border-blue-500/50 hover:bg-[#1a2540] transition-all px-3 py-2.5 text-left disabled:opacity-60 disabled:cursor-not-allowed"
       >
         <input
           ref={inputRef}
@@ -47,17 +48,18 @@ export default function CSVUpload({ label, description, onAnalyze, loading }: Pr
         <FileSpreadsheet size={16} className={pendingFile ? 'text-blue-400 shrink-0' : 'text-violet-400 shrink-0'} />
         <div className="flex-1 min-w-0">
           <div className="text-xs font-medium text-slate-300">{label}</div>
-          <div className={`text-xs truncate ${pendingFile ? 'text-blue-400' : 'text-slate-600'}`}>
+          <div className={`text-xs truncate ${pendingFile ? 'text-blue-400' : 'text-slate-400'}`}>
             {pendingFile?.name ?? description}
           </div>
         </div>
         {pendingFile && !loading && (
-          <button onClick={handleClear} className="p-1 text-slate-600 hover:text-red-400 transition-colors shrink-0">
+          <button onClick={handleClear} className="p-1 text-slate-400 hover:text-red-400 transition-colors shrink-0">
             <X size={12} />
           </button>
         )}
       </button>
 
+      {/* Submit button — always visible, disabled until a file is staged */}
       <button
         onClick={handleSubmit}
         disabled={!pendingFile || loading}

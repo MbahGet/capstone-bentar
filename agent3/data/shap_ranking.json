@@ -1,0 +1,156 @@
+{
+  "ranking": [
+    {
+      "feature": "total_downtime_minutes",
+      "mean_abs_shap": 5.048141956329346
+    },
+    {
+      "feature": "temperature",
+      "mean_abs_shap": 1.0377858877182007
+    },
+    {
+      "feature": "vibration",
+      "mean_abs_shap": 0.8476341962814331
+    },
+    {
+      "feature": "load",
+      "mean_abs_shap": 0.008443014696240425
+    },
+    {
+      "feature": "current",
+      "mean_abs_shap": 0.007966145873069763
+    },
+    {
+      "feature": "load_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "humidity_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "rotation_speed_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "voltage_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "current_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "oil_level_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "gearbox_temperature_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "motor_temperature_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "vibration_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "sound_level_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "fan_speed_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "reactive_power_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "active_power_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "avg_defect_rate_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "total_output_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "pressure_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "has_downtime",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "temperature_normalized",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "total_output",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "avg_defect_rate",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "machine_failure",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "active_power",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "reactive_power",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "fan_speed",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "sound_level",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "gearbox_temperature",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "motor_temperature",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "oil_level",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "voltage",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "rotation_speed",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "humidity",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "pressure",
+      "mean_abs_shap": 0.0
+    },
+    {
+      "feature": "total_downtime_minutes_normalized",
+      "mean_abs_shap": 0.0
+    }
+  ]
+}

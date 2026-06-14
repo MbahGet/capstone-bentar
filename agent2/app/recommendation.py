@@ -51,7 +51,7 @@ def _fallback_recommendation(payload: Dict[str, Any]) -> str:
     )
 
 
-def generate_recommendation(payload: Dict[str, Any]) -> Dict[str, Any]:
+def generate_recommendation(payload: Dict[str, Any], model_preference: str = "groq") -> Dict[str, Any]:
     settings = get_settings()
 
     summary = payload.get("summary", {})
@@ -89,14 +89,11 @@ def generate_recommendation(payload: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     # --- Groq (primary) ---
-    if settings.groq_api_key:
+    if settings.groq_api_key and model_preference != "ollama":
         try:
-            from openai import OpenAI
+            from groq import Groq
 
-            client = OpenAI(
-                api_key=settings.groq_api_key,
-                base_url=settings.groq_base_url,
-            )
+            client = Groq(api_key=settings.groq_api_key)
             response = client.chat.completions.create(
                 model=settings.groq_model,
                 messages=[
@@ -113,13 +110,42 @@ def generate_recommendation(payload: Dict[str, Any]) -> Dict[str, Any]:
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,
-                max_tokens=1024,
+                max_tokens=4096,
             )
             text = response.choices[0].message.content
             print(f"[Recommendation] Groq call OK ({settings.groq_model})")
             return {"source": "groq", "model": settings.groq_model, "text": text}
         except Exception as exc:
-            print(f"[Recommendation] Groq failed: {exc} — falling back to rule-based")
+            print(f"[Recommendation] Groq failed: {exc} — falling back to Ollama or rule-based")
+
+    if settings.ollama_base_url:
+        try:
+            import requests
+            url = f"{settings.ollama_base_url}/api/chat"
+            payload_ollama = {
+                "model": settings.ollama_model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "Kamu adalah AI Senior Industrial & Operations Engineer yang ahli "
+                            "dalam menganalisis anomali manufaktur dan Root Cause Analysis. "
+                            "Berikan instruksi operasional yang spesifik, berorientasi pada "
+                            "tindakan (actionable), dan langsung bisa dieksekusi oleh tim di lapangan. "
+                            "Gunakan bahasa Indonesia profesional dan struktur yang rapi (bullet points)."
+                        )
+                    },
+                    {"role": "user", "content": prompt}
+                ],
+                "stream": False
+            }
+            resp = requests.post(url, json=payload_ollama, timeout=60)
+            resp.raise_for_status()
+            text = resp.json()["message"]["content"]
+            print(f"[Recommendation] Ollama call OK ({settings.ollama_model})")
+            return {"source": "ollama", "model": settings.ollama_model, "text": text}
+        except Exception as exc:
+            print(f"[Recommendation] Ollama failed: {exc} — falling back to rule-based")
 
     # --- Fallback: rule-based ---
     return {

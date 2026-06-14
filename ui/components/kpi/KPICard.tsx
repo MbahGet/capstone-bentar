@@ -29,7 +29,7 @@ export default function KPICard({ label, value, unit, target, status }: Props) {
         {unit && <span className="text-sm font-normal ml-1">{unit}</span>}
       </div>
       {target && (
-        <div className="text-xs text-slate-600 mt-0.5">Target: {target}</div>
+        <div className="text-xs text-slate-400 mt-0.5">Target: {target}</div>
       )}
     </div>
   );

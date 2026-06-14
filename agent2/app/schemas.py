@@ -36,3 +36,4 @@ class AnalyzeResponse(BaseModel):
     model_metrics: Dict[str, Any]
     top_deviations: List[DeviationItem]
     recommendation: Recommendation
+    recommendation_report_text: str = ""

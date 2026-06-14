@@ -1,11 +1,3 @@
-export interface FileAttachment {
-  id: string;
-  name: string;
-  size: number;
-  type: 'csv' | 'pdf';
-  file?: File;
-}
-
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -15,10 +7,9 @@ export interface Message {
   timestamp: Date;
   isLoading?: boolean;
   isError?: boolean;
-  attachments?: FileAttachment[];
   kpiResult?: KPIResult;
   rcaResult?: RCAResult;
-  pipelineStatus?: string;
+  attachedFiles?: string[];
 }
 
 export interface KPISummary {

@@ -6,6 +6,16 @@ from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+import os
+from pathlib import Path
+
+try:
+    root_env = str(Path(__file__).resolve().parents[3] / ".env")
+    parent_env = str(Path(__file__).resolve().parents[2] / ".env")
+    env_files = (root_env, parent_env, ".env")
+except IndexError:
+    env_files = ".env"
+
 class Settings(BaseSettings):
     # Groq Configuration (primary LLM provider)
     groq_api_key: Optional[str] = None
@@ -15,10 +25,10 @@ class Settings(BaseSettings):
     # Ollama Configuration (fallback jika Groq tidak dikonfigurasi)
     ollama_api_key: str = "ollama"
     ollama_base_url: str = "http://host.docker.internal:11434"
-    ollama_model: str = "llama3.2:3b"
+    ollama_model: str = "llama3.1:8b"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=env_files,
         env_file_encoding="utf-8",
         env_prefix="",
         extra="ignore",

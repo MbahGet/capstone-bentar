@@ -5,7 +5,7 @@ out
 # Dependencies (di-install ulang saat build)
 node_modules
 
-# Dev environment files
+# Dev environment files — jangan masuk image
 .env.local
 .env.*.local
 

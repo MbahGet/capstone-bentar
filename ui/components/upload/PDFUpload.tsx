@@ -17,6 +17,7 @@ export default function PDFUpload({ onUpload }: Props) {
   const [errorMsg, setErrorMsg] = useState('');
 
   async function handleFile(file: File) {
+    // Accept by extension OR MIME type (some systems report application/octet-stream)
     const byExt  = file.name.toLowerCase().endsWith('.pdf');
     const byMime = file.type === 'application/pdf' || file.type === 'application/octet-stream';
 
@@ -56,7 +57,7 @@ export default function PDFUpload({ onUpload }: Props) {
     status === 'done'  ? 'border-emerald-500/50 bg-emerald-500/5' :
     (status === 'format-error' || status === 'upload-error')
                        ? 'border-red-500/50 bg-red-500/5' :
-                         'border-blue-500/50 bg-blue-500/5';
+                         'border-blue-500/50 bg-blue-500/5';  // uploading
 
   return (
     <div

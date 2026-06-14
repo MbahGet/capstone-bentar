@@ -23,15 +23,15 @@ class DataPreprocessor:
         
         # Load production log
         self.df_prod = pd.read_csv(self.prod_path)
-        print(f"Production log loaded: {len(self.df_prod)} rows")
+        print(f"✓ Production log loaded: {len(self.df_prod)} rows")
         
         # Load defect data
         self.df_defect = pd.read_csv(self.defect_path)
-        print(f"Defect data loaded: {len(self.df_defect)} rows")
+        print(f"✓ Defect data loaded: {len(self.df_defect)} rows")
         
         # Load downtime log
         self.df_downtime = pd.read_csv(self.downtime_path)
-        print(f"Downtime log loaded: {len(self.df_downtime)} rows")
+        print(f"✓ Downtime log loaded: {len(self.df_downtime)} rows")
     
     def parse_timestamps(self):
         """Parse timestamp ke format yang konsisten"""
@@ -49,7 +49,7 @@ class DataPreprocessor:
         # Downtime log: format "2024-01-01 02:00:00"
         self.df_downtime['timestamp'] = pd.to_datetime(self.df_downtime['timestamp'])
         
-        print("All timestamps parsed to datetime")
+        print("✓ All timestamps parsed to datetime")
     
     def aggregate_defects(self):
         """
@@ -69,7 +69,7 @@ class DataPreprocessor:
         
         defect_agg.columns = ['timestamp', 'avg_defect_rate', 'total_output']
         
-        print(f"Aggregated to {len(defect_agg)} unique hours")
+        print(f"✓ Aggregated to {len(defect_agg)} unique hours")
         return defect_agg
     
     def aggregate_downtime(self):
@@ -91,7 +91,7 @@ class DataPreprocessor:
         # Tambah binary flag: apakah ada downtime
         downtime_agg['has_downtime'] = (downtime_agg['total_downtime_minutes'] > 0).astype(int)
         
-        print(f"Aggregated to {len(downtime_agg)} unique hours with downtime")
+        print(f"✓ Aggregated to {len(downtime_agg)} unique hours with downtime")
         return downtime_agg
     
     def merge_data(self, defect_agg, downtime_agg):
@@ -117,7 +117,7 @@ class DataPreprocessor:
             how='left'
         )
         
-        print(f"Merged dataset shape: {merged.shape}")
+        print(f"✓ Merged dataset shape: {merged.shape}")
         return merged
     
     def handle_missing_values(self, df):
@@ -139,7 +139,7 @@ class DataPreprocessor:
         df['has_downtime'] = df['has_downtime'].fillna(0).astype(int)
         
         missing_after = df.isnull().sum().sum()
-        print(f"Missing values: {missing_before} → {missing_after}")
+        print(f"✓ Missing values: {missing_before} → {missing_after}")
         
         return df
     
@@ -162,7 +162,7 @@ class DataPreprocessor:
                 else:
                     df[f'{col}_normalized'] = 0
         
-        print(f"Normalized {len(numeric_cols)} numeric columns")
+        print(f"✓ Normalized {len(numeric_cols)} numeric columns")
         return df
     
     def create_target_variable(self, df):
@@ -182,7 +182,7 @@ class DataPreprocessor:
         
         num_incidents = df['defect_incident'].sum()
         pct_incidents = (num_incidents / len(df)) * 100
-        print(f"Target variable created: {num_incidents} defect incidents ({pct_incidents:.1f}%) out of {len(df)} records")
+        print(f"✓ Target variable created: {num_incidents} defect incidents ({pct_incidents:.1f}%) out of {len(df)} records")
         
         return df
     
@@ -232,7 +232,7 @@ class DataPreprocessor:
         """Save preprocessed data"""
         if self.merged_df is not None:
             self.merged_df.to_csv(output_path, index=False)
-            print(f"\nProcessed data saved to {output_path}")
+            print(f"\n✓ Processed data saved to {output_path}")
         else:
             print("Error: Run preprocess() first!")
 
@@ -242,6 +242,29 @@ if __name__ == "__main__":
     # Get current directory
     current_dir = Path(__file__).parent
     data_dir = current_dir / 'data'
+    
+    # --- Integrasi dengan Data Gateway ---
+    import sys
+    root_dir = current_dir.parent
+    if str(root_dir) not in sys.path:
+        sys.path.insert(0, str(root_dir))
+        
+    try:
+        from data_gateway import load_integrated_csv, generate_agent3_dfs
+        integrated_path = data_dir / 'integrated_production_log.csv'
+        
+        if integrated_path.exists():
+            print("Mengekstrak file CSV terintegrasi menjadi file terpisah untuk Agent 3...")
+            df_int = load_integrated_csv(str(integrated_path))
+            df_prod, df_defect, df_down = generate_agent3_dfs(df_int)
+            
+            # Save hasil pecahan agar DataPreprocessor bisa membacanya tanpa modifikasi
+            df_prod.to_csv(data_dir / 'production_log.csv', index=False)
+            df_defect.to_csv(data_dir / 'defect_data.csv', index=False)
+            df_down.to_csv(data_dir / 'downtime_log.csv', index=False)
+    except Exception as e:
+        print(f"Tidak dapat menggunakan Data Gateway: {e}")
+    # -------------------------------------
     
     print(f"Current directory: {current_dir}")
     print(f"Data directory: {data_dir}")

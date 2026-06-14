@@ -1,0 +1,387 @@
+{
+  "pearson": {
+    "temperature": {
+      "correlation": 0.46489472730159237,
+      "p_value": 9.16067913192788e-55,
+      "significance": "significant"
+    },
+    "vibration": {
+      "correlation": 0.18572302214092035,
+      "p_value": 3.272978548816671e-09,
+      "significance": "significant"
+    },
+    "pressure": {
+      "correlation": 0.03928065198292427,
+      "p_value": 0.21457299058436294,
+      "significance": "not significant"
+    },
+    "humidity": {
+      "correlation": 0.031647493990262135,
+      "p_value": 0.31741680981105636,
+      "significance": "not significant"
+    },
+    "rotation_speed": {
+      "correlation": 0.0330804973423302,
+      "p_value": 0.2959883861463614,
+      "significance": "not significant"
+    },
+    "voltage": {
+      "correlation": -0.017128797331324004,
+      "p_value": 0.5884921731515558,
+      "significance": "not significant"
+    },
+    "current": {
+      "correlation": 0.009017305631212929,
+      "p_value": 0.7757963102250379,
+      "significance": "not significant"
+    },
+    "oil_level": {
+      "correlation": 0.023158360880040765,
+      "p_value": 0.46446535767084207,
+      "significance": "not significant"
+    },
+    "load": {
+      "correlation": -0.00211210014917039,
+      "p_value": 0.9468149540225951,
+      "significance": "not significant"
+    },
+    "motor_temperature": {
+      "correlation": 0.013712965252361535,
+      "p_value": 0.6649275671993989,
+      "significance": "not significant"
+    },
+    "gearbox_temperature": {
+      "correlation": -0.02715075143142807,
+      "p_value": 0.39107669356014185,
+      "significance": "not significant"
+    },
+    "sound_level": {
+      "correlation": 0.023324649099463125,
+      "p_value": 0.461263518463581,
+      "significance": "not significant"
+    },
+    "fan_speed": {
+      "correlation": -0.07201258622163463,
+      "p_value": 0.022765515976550257,
+      "significance": "significant"
+    },
+    "reactive_power": {
+      "correlation": 0.011827823222700592,
+      "p_value": 0.7087213746069253,
+      "significance": "not significant"
+    },
+    "active_power": {
+      "correlation": 0.01910461303566987,
+      "p_value": 0.5462157719295541,
+      "significance": "not significant"
+    },
+    "machine_failure": {
+      "correlation": 0.16497649516104804,
+      "p_value": 1.5503342363276178e-07,
+      "significance": "significant"
+    },
+    "avg_defect_rate": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_output": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_downtime_minutes": {
+      "correlation": 0.8311464342112649,
+      "p_value": 1.2847450409787055e-256,
+      "significance": "significant"
+    },
+    "has_downtime": {
+      "correlation": 0.9598109156184964,
+      "p_value": 0.0,
+      "significance": "significant"
+    },
+    "temperature_normalized": {
+      "correlation": 0.46489472730159237,
+      "p_value": 9.16067913192788e-55,
+      "significance": "significant"
+    },
+    "vibration_normalized": {
+      "correlation": 0.18572302214092032,
+      "p_value": 3.272978548816671e-09,
+      "significance": "significant"
+    },
+    "pressure_normalized": {
+      "correlation": 0.03928065198292427,
+      "p_value": 0.21457299058436294,
+      "significance": "not significant"
+    },
+    "humidity_normalized": {
+      "correlation": 0.03164749399026212,
+      "p_value": 0.31741680981106085,
+      "significance": "not significant"
+    },
+    "rotation_speed_normalized": {
+      "correlation": 0.03308049734233019,
+      "p_value": 0.2959883861463614,
+      "significance": "not significant"
+    },
+    "voltage_normalized": {
+      "correlation": -0.01712879733132399,
+      "p_value": 0.5884921731515625,
+      "significance": "not significant"
+    },
+    "current_normalized": {
+      "correlation": 0.00901730563121294,
+      "p_value": 0.7757963102250379,
+      "significance": "not significant"
+    },
+    "oil_level_normalized": {
+      "correlation": 0.023158360880040765,
+      "p_value": 0.46446535767084207,
+      "significance": "not significant"
+    },
+    "load_normalized": {
+      "correlation": -0.0021121001491703787,
+      "p_value": 0.9468149540225951,
+      "significance": "not significant"
+    },
+    "motor_temperature_normalized": {
+      "correlation": 0.01371296525236157,
+      "p_value": 0.6649275671993989,
+      "significance": "not significant"
+    },
+    "gearbox_temperature_normalized": {
+      "correlation": -0.027150751431428057,
+      "p_value": 0.39107669356014185,
+      "significance": "not significant"
+    },
+    "sound_level_normalized": {
+      "correlation": 0.02332464909946312,
+      "p_value": 0.461263518463581,
+      "significance": "not significant"
+    },
+    "fan_speed_normalized": {
+      "correlation": -0.07201258622163463,
+      "p_value": 0.022765515976550257,
+      "significance": "significant"
+    },
+    "reactive_power_normalized": {
+      "correlation": 0.011827823222700576,
+      "p_value": 0.7087213746069253,
+      "significance": "not significant"
+    },
+    "active_power_normalized": {
+      "correlation": 0.01910461303566987,
+      "p_value": 0.5462157719295541,
+      "significance": "not significant"
+    },
+    "avg_defect_rate_normalized": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_output_normalized": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_downtime_minutes_normalized": {
+      "correlation": 0.8311464342112649,
+      "p_value": 1.2847450409787055e-256,
+      "significance": "significant"
+    }
+  },
+  "spearman": {
+    "temperature": {
+      "correlation": 0.49789043594570936,
+      "p_value": 9.264386353755836e-64,
+      "significance": "significant"
+    },
+    "vibration": {
+      "correlation": 0.1675552198270671,
+      "p_value": 9.839917967244129e-08,
+      "significance": "significant"
+    },
+    "pressure": {
+      "correlation": 0.03604685232564018,
+      "p_value": 0.25476740030522516,
+      "significance": "not significant"
+    },
+    "humidity": {
+      "correlation": 0.024520450688245803,
+      "p_value": 0.4386047988984296,
+      "significance": "not significant"
+    },
+    "rotation_speed": {
+      "correlation": 0.019444538414387036,
+      "p_value": 0.5390968478018361,
+      "significance": "not significant"
+    },
+    "voltage": {
+      "correlation": -0.02348951787098817,
+      "p_value": 0.4581012044058659,
+      "significance": "not significant"
+    },
+    "current": {
+      "correlation": 0.014268396561072667,
+      "p_value": 0.6522310655135911,
+      "significance": "not significant"
+    },
+    "oil_level": {
+      "correlation": 0.011125483319571963,
+      "p_value": 0.7252961421902604,
+      "significance": "not significant"
+    },
+    "load": {
+      "correlation": -0.015793318019932917,
+      "p_value": 0.6178956049586436,
+      "significance": "not significant"
+    },
+    "motor_temperature": {
+      "correlation": 0.011726860796305583,
+      "p_value": 0.7110957806063398,
+      "significance": "not significant"
+    },
+    "gearbox_temperature": {
+      "correlation": -0.038796006504993874,
+      "p_value": 0.2202873128914176,
+      "significance": "not significant"
+    },
+    "sound_level": {
+      "correlation": 0.030770480892870204,
+      "p_value": 0.33102009910414937,
+      "significance": "not significant"
+    },
+    "fan_speed": {
+      "correlation": -0.07599549899437348,
+      "p_value": 0.016231879866574,
+      "significance": "significant"
+    },
+    "reactive_power": {
+      "correlation": 0.022229488872117727,
+      "p_value": 0.48257582058783727,
+      "significance": "not significant"
+    },
+    "active_power": {
+      "correlation": 0.023747251075302577,
+      "p_value": 0.45318209578945634,
+      "significance": "not significant"
+    },
+    "machine_failure": {
+      "correlation": 0.16497649516104804,
+      "p_value": 1.550334236327593e-07,
+      "significance": "significant"
+    },
+    "avg_defect_rate": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_output": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_downtime_minutes": {
+      "correlation": 0.9300085287571773,
+      "p_value": 0.0,
+      "significance": "significant"
+    },
+    "has_downtime": {
+      "correlation": 0.959810915618495,
+      "p_value": 0.0,
+      "significance": "significant"
+    },
+    "temperature_normalized": {
+      "correlation": 0.49789043594570936,
+      "p_value": 9.264386353755836e-64,
+      "significance": "significant"
+    },
+    "vibration_normalized": {
+      "correlation": 0.1675552198270671,
+      "p_value": 9.839917967244129e-08,
+      "significance": "significant"
+    },
+    "pressure_normalized": {
+      "correlation": 0.03604685232564018,
+      "p_value": 0.25476740030522516,
+      "significance": "not significant"
+    },
+    "humidity_normalized": {
+      "correlation": 0.024520450688245803,
+      "p_value": 0.4386047988984296,
+      "significance": "not significant"
+    },
+    "rotation_speed_normalized": {
+      "correlation": 0.019444538414387036,
+      "p_value": 0.5390968478018361,
+      "significance": "not significant"
+    },
+    "voltage_normalized": {
+      "correlation": -0.02348951787098817,
+      "p_value": 0.4581012044058659,
+      "significance": "not significant"
+    },
+    "current_normalized": {
+      "correlation": 0.014268396561072667,
+      "p_value": 0.6522310655135911,
+      "significance": "not significant"
+    },
+    "oil_level_normalized": {
+      "correlation": 0.011125483319571963,
+      "p_value": 0.7252961421902604,
+      "significance": "not significant"
+    },
+    "load_normalized": {
+      "correlation": -0.015793318019932917,
+      "p_value": 0.6178956049586436,
+      "significance": "not significant"
+    },
+    "motor_temperature_normalized": {
+      "correlation": 0.011726860796305583,
+      "p_value": 0.7110957806063398,
+      "significance": "not significant"
+    },
+    "gearbox_temperature_normalized": {
+      "correlation": -0.038796006504993874,
+      "p_value": 0.2202873128914176,
+      "significance": "not significant"
+    },
+    "sound_level_normalized": {
+      "correlation": 0.030770480892870204,
+      "p_value": 0.33102009910414937,
+      "significance": "not significant"
+    },
+    "fan_speed_normalized": {
+      "correlation": -0.07599549899437348,
+      "p_value": 0.016231879866574,
+      "significance": "significant"
+    },
+    "reactive_power_normalized": {
+      "correlation": 0.022229488872117727,
+      "p_value": 0.48257582058783727,
+      "significance": "not significant"
+    },
+    "active_power_normalized": {
+      "correlation": 0.023747251075302577,
+      "p_value": 0.45318209578945634,
+      "significance": "not significant"
+    },
+    "avg_defect_rate_normalized": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_output_normalized": {
+      "correlation": NaN,
+      "p_value": NaN,
+      "significance": "not significant"
+    },
+    "total_downtime_minutes_normalized": {
+      "correlation": 0.9300085287571773,
+      "p_value": 0.0,
+      "significance": "significant"
+    }
+  },
+  "chi_square": {}
+}

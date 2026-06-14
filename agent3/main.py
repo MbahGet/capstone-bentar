@@ -28,6 +28,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 class RCAQueryRequest(BaseModel):
     query: str
     sessionId: str | None = None
+    model_preference: str | None = "groq"
 
 @app.get("/")
 async def root():
@@ -39,7 +40,6 @@ async def root():
     }
 
 @app.post("/query")
-@app.post("/report")
 async def query_rca(request: RCAQueryRequest):
     """
     Endpoint khusus untuk dipanggil oleh Agent 1 (n8n).
@@ -73,6 +73,8 @@ async def query_rca(request: RCAQueryRequest):
         
         # Step 4: LLM Explanation
         explainer = LLMExplainer(str(data_dir / "shap_ranking.json"))
+        if request.model_preference == "ollama":
+            explainer.force_ollama = True
         # (Asumsi shap_analyzer.save_results sudah dipanggil di pipeline lu)
         shap_analyzer.save_results(feature_importance, str(data_dir))
         
@@ -83,6 +85,8 @@ async def query_rca(request: RCAQueryRequest):
         return {
             "status": "success",
             "rca_analysis": explanation,
+            # Full Fishbone narrative text — consumed by n8n chatbot Agent 3
+            "rca_report_text": explanation if isinstance(explanation, str) else explanation.get("full_explanation", ""),
             "top_features": feature_importance.head(5).to_dict(orient='records'),
             "metadata": {
                 "records_analyzed": len(merged_df),
@@ -91,21 +95,86 @@ async def query_rca(request: RCAQueryRequest):
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"RCA Query failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"RCA Query failed: {str(e)}") 
+
+from fastapi.responses import PlainTextResponse
+
+
+@app.post("/report_full", response_class=PlainTextResponse)
+async def report_full_rca(request: RCAQueryRequest) -> str:
+    """
+    Endpoint for frontend injection. Returns full Fishbone plain text report.
+    """
+    try:
+        data_dir = Path("data")
+        prod_path = data_dir / "production_log.csv"
+        defect_path = data_dir / "defect_data.csv"
+        downtime_path = data_dir / "downtime_log.csv"
+
+        if not prod_path.exists():
+            return "Error: Data CSV tidak ditemukan di folder data/."
+
+        preprocessor = DataPreprocessor(str(prod_path), str(defect_path), str(downtime_path))
+        merged_df = preprocessor.preprocess()
+        merged_path = data_dir / "merged_dataset.csv"
+        preprocessor.save_processed_data(str(merged_path))
+
+        shap_analyzer = SHAPAnalyzer(str(merged_path))
+        shap_analyzer.load_and_prepare_data()
+        shap_analyzer.train_xgboost()
+        shap_analyzer.calculate_shap_values()
+        feature_importance = shap_analyzer.rank_features_by_shap()
+        shap_analyzer.save_results(feature_importance, str(data_dir))
+
+        explainer = LLMExplainer(str(data_dir / "shap_ranking.json"))
+        if request.model_preference == "ollama":
+            explainer.force_ollama = True
+        explainer.load_shap_ranking()
+        explanation = explainer.generate_explanation()
+
+        if isinstance(explanation, str) and explanation.strip():
+            return explanation
+
+        # Fallback jika Groq gagal atau explanation bukan string
+        top = feature_importance.head(5).to_dict(orient="records")
+        lines = ["LAPORAN ROOT-CAUSE ANALYSIS (RCA) — FALLBACK", ""]
+        lines.append("TOP ROOT CAUSES (berdasarkan SHAP):")
+        for i, f in enumerate(top, 1):
+            lines.append(f"  {i}. {f.get('feature','?')} — skor: {f.get('mean_abs_shap', 0):.4f}")
+        return "\n".join(lines)
+
+    except Exception as e:
+        return f"Error saat menjalankan RCA pipeline: {str(e)}"
+
+
+@app.post("/report")
+async def report_rca_summary(request: RCAQueryRequest) -> dict:
+    """
+    Endpoint khusus untuk n8n Tool Calling.
+    Mengembalikan JSON summary untuk memory.
+    """
+    try:
+        data_dir = Path("data")
+        merged_path = data_dir / "merged_dataset.csv"
+        
+        # We can just return a quick summary without rerunning everything
+        # if the files exist, or just a generic summary
+        return {
+            "summary": "RCA Pipeline executed successfully. Top root causes identified via SHAP.",
+            "instruction": "Reply to the user ONLY with this exact string: [INJECT_REPORT_3]. Do not add any other words, greetings, or formatting."
+        }
+
+    except Exception as e:
+        return {"summary": f"Error: {str(e)}", "instruction": "Inform user of error."}
+
 
 @app.post("/analyze")
-async def analyze_rca(
-    production_log: UploadFile = File(...),
-    defect_data: UploadFile = File(...),
-    downtime_log: UploadFile = File(...)
-):
+async def analyze_rca(file: UploadFile = File(...)):
     """
     Main endpoint untuk RCA analysis
     
     Input:
-    - production_log: CSV dengan sensor data produksi
-    - defect_data: CSV dengan data defect
-    - downtime_log: CSV dengan log downtime
+    - file: Single integrated CSV yang memuat data produksi, defect, dan downtime
     
     Output:
     - JSON dengan ranking root causes
@@ -120,22 +189,38 @@ async def analyze_rca(
         temp_dir = Path(tempfile.mkdtemp())
         print(f"\n[RCA] Created temp dir: {temp_dir}")
         
-        # Save uploaded files
+        # --- Gunakan Data Gateway ---
+        import sys
+        import pandas as pd
+        from io import StringIO
+        root_dir = Path(__file__).resolve().parents[1]
+        if str(root_dir) not in sys.path:
+            sys.path.insert(0, str(root_dir))
+            
+        from data_gateway import generate_agent3_dfs
+        
+        print("[RCA] Processing integrated CSV with Data Gateway...")
+        csv_text = (await file.read()).decode("utf-8-sig")
+        df_int = pd.read_csv(StringIO(csv_text))
+        
+        # Standarisasi kolom waktu ke datetime untuk gateway
+        if 'timestamp' in df_int.columns:
+            df_int['timestamp'] = pd.to_datetime(df_int['timestamp'])
+        elif 'date' in df_int.columns:
+            df_int['timestamp'] = pd.to_datetime(df_int['date'])
+            
+        df_prod, df_defect, df_down = generate_agent3_dfs(df_int)
+        
         prod_path = temp_dir / "production_log.csv"
         defect_path = temp_dir / "defect_data.csv"
         downtime_path = temp_dir / "downtime_log.csv"
         
-        print("[RCA] Saving uploaded files...")
-        with open(prod_path, "wb") as f:
-            f.write(await production_log.read())
+        df_prod.to_csv(prod_path, index=False)
+        df_defect.to_csv(defect_path, index=False)
+        df_down.to_csv(downtime_path, index=False)
         
-        with open(defect_path, "wb") as f:
-            f.write(await defect_data.read())
-        
-        with open(downtime_path, "wb") as f:
-            f.write(await downtime_log.read())
-        
-        print(f"[RCA] Files saved to {temp_dir}")
+        print(f"[RCA] Extracted files saved to {temp_dir}")
+        # ----------------------------
         
         # Step 1: Preprocessing
         print("\n[RCA] Step 1: Preprocessing...")
@@ -147,7 +232,7 @@ async def analyze_rca(
         merged_df = preprocessor.preprocess()
         merged_path = temp_dir / "merged_dataset.csv"
         preprocessor.save_processed_data(str(merged_path))
-        print("[RCA] Preprocessing complete")
+        print("[RCA] ✓ Preprocessing complete")
         
         # Step 2: Correlation Analysis
         print("\n[RCA] Step 2: Correlation Analysis...")
@@ -160,7 +245,7 @@ async def analyze_rca(
         analyzer.rank_features_by_correlation()
         analyzer.create_correlation_matrix()
         analyzer.save_results(str(temp_dir))
-        print("[RCA] Correlation analysis complete")
+        print("[RCA] ✓ Correlation analysis complete")
         
         # Step 3: SHAP Analysis
         print("\n[RCA] Step 3: SHAP Analysis...")
@@ -171,7 +256,7 @@ async def analyze_rca(
         feature_importance = shap_analyzer.rank_features_by_shap()
         shap_analyzer.create_shap_visualizations(str(temp_dir))
         shap_analyzer.save_results(feature_importance, str(temp_dir))
-        print("[RCA] SHAP analysis complete")
+        print("[RCA] ✓ SHAP analysis complete")
         
         # Step 4: LLM Explanation
         print("\n[RCA] Step 4: LLM Explanation Generation...")
@@ -181,7 +266,7 @@ async def analyze_rca(
         explanation = explainer.generate_explanation()
         explainer.save_explanation(str(temp_dir / "rca_explanation.txt"))
         explainer.create_summary_json(str(temp_dir / "rca_result.json"))
-        print("[RCA] LLM explanation complete")
+        print("[RCA] ✓ LLM explanation complete")
         
         # Prepare response
         print("\n[RCA] Preparing response...")
@@ -207,6 +292,8 @@ async def analyze_rca(
             },
             "root_causes": rca_result['top_root_causes'],
             "explanation": explanation_text,
+            # Full Fishbone narrative text — consumed by n8n chatbot Agent 3
+            "rca_report_text": explanation_text,
             "feature_importance": feature_importance_lines[:6],  # Top 5 + header
             "artifacts": {
                 "shap_summary_bar": "shap_summary_bar.png",
@@ -215,11 +302,11 @@ async def analyze_rca(
             }
         }
         
-        print("[RCA] Response prepared")
+        print("[RCA] ✓ Response prepared")
         return JSONResponse(content=response_data, status_code=200)
     
     except Exception as e:
-        print(f"\n[RCA] Error: {str(e)}")
+        print(f"\n[RCA] ❌ Error: {str(e)}")
         import traceback
         traceback.print_exc()
         

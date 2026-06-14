@@ -89,6 +89,34 @@ body {
   scroll-behavior: smooth;
 }
 
+/* History sidebar slide */
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+/* Stagger for history items */
+@keyframes stagger-item {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Tab content fade */
+@keyframes tab-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-slide-in-left  { animation: slide-in-left 0.25s ease-out; }
+.animate-stagger-item   { animation: stagger-item 0.2s ease-out both; }
+.animate-tab-fade       { animation: tab-fade 0.2s ease-out; }
+
+@keyframes session-reset {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+.animate-session-reset { animation: session-reset 0.28s cubic-bezier(0.16,1,0.3,1); }
+
 /* Markdown prose: ol li shouldn't double-render bullet */
 .chat-prose ol > li {
   display: list-item;

@@ -1,0 +1,73 @@
+**REKOMENDASI TINDAKAN TAKTIS – SUPERVISOR PRODUKSI**  
+*(Prioritas disusun: 1) Alert HIGH Defect > 3 % → tindakan paling mendesak, 2) Alert MEDIUM Downtime > 15 % → selanjutnya, 3) Mesin dengan probabilitas deviasi 99.83 % → penanganan terfokus pada mesin‑mesin kritis)*  
+
+---
+
+## 1️⃣  TINDAKAN PRIORITAS TINGGI – Defect Rate (HIGH)
+
+| No | Tindakan | Detail Pelaksanaan | Penanggung Jawab | Target Penyelesaian |
+|----|----------|--------------------|------------------|---------------------|
+| 1 | **Audit Cepat Produk & Proses** | - Pilih 5 % sampel acak dari shift terakhir (semua lini). <br> - Lakukan inspeksi visual + pengukuran dimensi kritis. <br> - Catat jenis defect (scrap, rework, out‑of‑spec). | Quality Engineer + Shift Leader | **Hari 1 (shift 1)** |
+| 2 | **Identifikasi Penyebab Utama (5‑Why / Fishbone)** | - Fokus pada defect yang paling sering muncul. <br> - Libatkan operator mesin M‑01 & M‑03 serta tim maintenance. | Quality Engineer | **Hari 1 – Hari 2** |
+| 3 | **Implementasi Countermeasure Cepat** (jika penyebabnya “setup/parameter” atau “material”) | - Reset parameter CNC / mesin ke standar yang sudah tervalidasi. <br> - Ganti batch material yang tidak memenuhi spesifikasi (cek sertifikat). <br> - Tambah inspeksi in‑process (check‑point setiap 30 menit). | Production Supervisor + Maintenance Lead | **Hari 2 – Hari 3** |
+| 4 | **Peningkatan Dokumentasi & SOP** | - Update SOP “Penggantian Tool/Die” dan “Pengendalian Material Incoming”. <br> - Buat checklist digital yang harus di‑sign off sebelum produksi dimulai. | Document Control | **Hari 4** |
+| 5 | **Monitoring Real‑Time Defect** | - Aktifkan alarm pada MES bila defect > 2 % per jam. <br> - Kirim notifikasi ke supervisor via mobile app. | IT / MES Administrator | **Hari 5** |
+| 6 | **Evaluasi Hasil** | - Bandingkan defect rate harian selama 3 hari setelah countermeasure. <br> - Jika turun < 3 % → tutup aksi; bila masih > 3 % → lanjut ke analisis lanjutan (root‑cause mendalam). | Supervisor + Quality Manager | **Hari 8** |
+
+---
+
+## 2️⃣  TINDAKAN PRIORITAS SEDANG – Downtime Rate (MEDIUM)
+
+| No | Tindakan | Detail Pelaksanaan | Penanggung Jawab | Target Penyelesaian |
+|----|----------|--------------------|------------------|---------------------|
+| 1 | **Klasifikasi Downtime** | - Gunakan log OEE untuk mengkategorikan downtime: *Planned*, *Unplanned – Mechanical*, *Unplanned – Changeover*, *Quality‑related*. <br> - Fokus pada kategori dengan persentase tertinggi (lihat data mesin M‑01 & M‑03). | Maintenance Planner | **Hari 1** |
+| 2 | **Rapid Root‑Cause pada Mesin M‑01 & M‑03** | - Lakukan “5‑Why” pada downtime > 15 min yang terjadi pada 2026‑03‑01/02 & 2026‑05‑18/20. <br> - Catat komponen yang sering rusak (mis: spindle bearing, sensor, pneumatic valve). | Maintenance Lead | **Hari 2 – Hari 3** |
+| 3 | **Implementasi Quick‑Fix** | - Ganti/​lubrikasi komponen kritis yang teridentifikasi (mis: bearing, filter). <br> - Perbaiki prosedur changeover: standar waktu, checklist, dan “single‑minute exchange of die (SMED)”. | Maintenance Team | **Hari 4** |
+| 4 | **Penjadwalan Preventive Maintenance (PM) Re‑Optimasi** | - Tambah frekuensi PM pada komponen dengan MTBF < 200 jam. <br> - Integrasikan reminder di MES. | Maintenance Planner | **Hari 5 – Hari 7** |
+| 5 | **Training Operator – “First‑Level Trouble‑Shooting”** | - 2 jam sesi on‑the‑job untuk mengenali gejala awal (vibration, alarm, abnormal sound). <br> - Berikan “stop‑card” untuk menghentikan produksi sebelum kerusakan meluas. | Training Coordinator | **Hari 8** |
+| 6 | **Pengukuran Ulang Downtime** | - Hitung kembali downtime rate setelah 7 hari aksi. <br> - Target: ≤ 12 % (margin aman di bawah threshold 15 %). | Supervisor + OEE Analyst | **Hari 10** |
+
+---
+
+## 3️⃣  TINDAKAN FOKUS – Mesin dengan Probabilitas Deviasi 99.83 %  
+
+> **Catatan:** Semua mesin di atas (M‑01 & M‑03) menunjukkan OEE < 80 % dan defect > 4 % pada tanggal‑tanggal kritis.  
+
+| No | Tindakan | Detail Pelaksanaan | Penanggung Jawab | Target Penyelesaian |
+|----|----------|--------------------|------------------|---------------------|
+| 1 | **Isolasi & Analisis Historis** | - Ekstrak 30 hari log sensor (temperature, pressure, vibration). <br> - Plot trend vs. event deviasi. | Data Engineer (MES) | **Hari 1 – Hari 2** |
+| 2 | **Kalibrasi & Verifikasi Sensor** | - Periksa kalibrasi sensor suhu & tekanan pada M‑01 & M‑03. <br> - Ganti sensor yang out‑of‑tolerance (> ±5 %). | Maintenance – Electrical | **Hari 3** |
+| 3 | **Audit Parameter Proses** | - Bandingkan set‑point aktual dengan recipe standar (speed, feed, coolant flow). <br> - Reset ke nilai standar jika terdapat drift. | Process Engineer | **Hari 3 – Hari 4** |
+| 4 | **Penerapan “Run‑to‑Failure” Monitoring** | - Pasang modul vibration analysis (FFT) pada spindle. <br> - Set alarm pada level RMS > X dB (nilai baseline). | Maintenance – Reliability | **Hari 5** |
+| 5 | **Standardisasi Change‑over** | - Buat SOP “Fast Change‑over” khusus M‑01 & M‑03 (target ≤ 10 menit). <br> - Implementasikan visual board di area mesin. | Production Engineer | **Hari 6** |
+| 6 | **Review & Update Preventive Maintenance Plan** | - Tambah inspeksi harian pada bearing, coolant filter, dan pneumatic seals. <br> - Dokumentasikan hasil inspeksi di aplikasi OEE. | Maintenance Planner | **Hari 7** |
+| 7 | **Evaluasi Kinerja Pasca‑Aksi** | - Hitung OEE, downtime, defect untuk masing‑masing mesin selama 7 hari berikutnya. <br> - Jika OEE masih < 80 % → lakukan “Deep‑Dive RCA” (FMEA). | Supervisor + Reliability Engineer | **Hari 14** |
+
+---
+
+## 4️⃣  TINDAKAN JANGKA PANJANG (Preventive)
+
+| No | Inisiatif | Manfaat Utama | Timeline |
+|----|-----------|---------------|----------|
+| 1 | **Implementasi Predictive Maintenance (AI‑based)** – model prediksi downtime & defect berdasarkan sensor historis. | Mengurangi downtime tak terduga > 30 % dalam 6 bulan. | 3‑6 bulan |
+| 2 | **Peningkatan Kualitas Bahan Baku** – audit pemasok, sertifikasi ISO/TS, dan penerapan “First‑Article Inspection”. | Defect rate turun < 2 % secara berkelanjutan. | 2‑4 bulan |
+| 3 | **Lean Six‑Sigma Project – “Reduce Defect & Downtime”** – DMAIC dengan tim lintas fungsi. | Peningkatan OEE > 95 % dan sustainabilitas perbaikan. | 6‑12 bulan |
+| 4 | **Digital Twin untuk Line Produksi** – simulasi skenario perubahan parameter. | Memungkinkan trial‑and‑error tanpa menghentikan produksi. | 9‑12 bulan |
+
+---
+
+### Ringkasan Prioritas Eksekusi
+
+1. **Defect HIGH** → aksi cepat (audit, 5‑Why, countermeasure) – selesai dalam 8 hari.  
+2. **Downtime MEDIUM** → klasifikasi, quick‑fix, training – selesai dalam 10 hari.  
+3. **Mesin M‑01 & M‑03 dengan deviasi 99.83 %** → isolasi data, kalibrasi sensor, SOP change‑over – selesai dalam 14 hari.  
+4. **Inisiatif jangka panjang** → dijadwalkan paralel setelah stabilisasi KPI.
+
+---
+
+**Catatan untuk Supervisor:**  
+- Pastikan semua tindakan tercatat di sistem OEE/MES dengan timestamp.  
+- Lakukan *daily stand‑up* (15 menit) dengan tim Quality, Maintenance, dan Operator untuk review progres dan hambatan.  
+- Kirim laporan ringkas (KPIs vs. target) ke Plant Manager setiap akhir minggu.  
+
+Semoga langkah‑langkah di atas dapat menurunkan defect di bawah 3 % dan downtime di bawah 15 % dalam waktu singkat, serta mengembalikan OEE ke level > 90 %. Selamat bekerja!
