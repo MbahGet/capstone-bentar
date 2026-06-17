@@ -1,0 +1,5 @@
+[Tool Description: Agent 2 (Kondisi B - Data KPI & OEE)]
+Call this tool ONLY for Kondisi B. Use when the user asks for current KPI, OEE, downtime, machine status, defect rate, or tactical recommendations for the supervisor. Trigger words: hasil agent 2, OEE saat ini, berapa OEE, nilai OEE, kondisi mesin sekarang, mesin deviasi, rekomendasi tindakan untuk supervisor, KPI produksi, paling bermasalah, berapa defect rate, defect rate saat ini, defect tercatat, berapa downtime, data produksi terkini, laporan produksi, status produksi, angka KPI, performa mesin. The tool returns a plain-text report. FORWARD THE RESPONSE VERBATIM without any reformatting.
+
+[Tool Description: Agent 3 (Kondisi C - RCA & Fishbone)]
+Call this tool ONLY for Kondisi C. Use when the user asks about RCA, root cause analysis, why defect is high, fishbone diagram, SHAP, or RCA recommendations. Trigger words: hasil agent 3, kenapa defect tinggi, penyebab utama defect, analisis fishbone, mempengaruhi defect, RCA, akar masalah, rekomendasi RCA, kenapa mesin sering rusak, apa faktor penyebab. The tool returns a plain-text report. FORWARD THE RESPONSE VERBATIM without any reformatting.

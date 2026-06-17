@@ -11,8 +11,8 @@ export default function RCAResultPanel({ result }: { result: RCAResult }) {
       <div className="grid grid-cols-3 gap-2">
         {[
           { label: 'Records', value: result.summary.total_records_analyzed.toLocaleString() },
-          { label: 'Insiden Defect', value: result.summary.defect_incidents_detected.toLocaleString() },
-          { label: 'Defect Rate', value: `${result.summary.defect_rate_percentage.toFixed(1)}%` },
+          { label: 'Anomali Proses', value: result.summary.defect_incidents_detected.toLocaleString() },
+          { label: 'Anomaly Rate', value: `${result.summary.defect_rate_percentage.toFixed(1)}%` },
         ].map(({ label, value }) => (
           <div key={label} className="bg-[#141c2e] border border-[#1e2d4a] rounded-xl px-3 py-2 text-center">
             <div className="text-xs text-slate-400">{label}</div>
