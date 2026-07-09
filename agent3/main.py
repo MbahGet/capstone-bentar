@@ -28,7 +28,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 class RCAQueryRequest(BaseModel):
     query: str
     sessionId: str | None = None
-    model_preference: str | None = "groq"
+    model_preference: str | None = "ollama"
 
 @app.get("/")
 async def root():
@@ -73,8 +73,6 @@ async def query_rca(request: RCAQueryRequest):
         
         # Step 4: LLM Explanation
         explainer = LLMExplainer(str(data_dir / "shap_ranking.json"))
-        if request.model_preference == "ollama":
-            explainer.force_ollama = True
         # (Asumsi shap_analyzer.save_results sudah dipanggil di pipeline lu)
         shap_analyzer.save_results(feature_importance, str(data_dir))
         
@@ -96,6 +94,7 @@ async def query_rca(request: RCAQueryRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RCA Query failed: {str(e)}") 
+
 
 from fastapi.responses import PlainTextResponse
 
@@ -127,15 +126,13 @@ async def report_full_rca(request: RCAQueryRequest) -> str:
         shap_analyzer.save_results(feature_importance, str(data_dir))
 
         explainer = LLMExplainer(str(data_dir / "shap_ranking.json"))
-        if request.model_preference == "ollama":
-            explainer.force_ollama = True
         explainer.load_shap_ranking()
         explanation = explainer.generate_explanation()
 
         if isinstance(explanation, str) and explanation.strip():
             return explanation
 
-        # Fallback jika Groq gagal atau explanation bukan string
+        # Fallback jika Ollama gagal atau explanation bukan string
         top = feature_importance.head(5).to_dict(orient="records")
         lines = ["LAPORAN ROOT-CAUSE ANALYSIS (RCA) — FALLBACK", ""]
         lines.append("TOP ROOT CAUSES (berdasarkan SHAP):")

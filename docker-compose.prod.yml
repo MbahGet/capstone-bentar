@@ -38,8 +38,9 @@ services:
       - ./data/agent2:/app/data
     environment:
       PYTHONUNBUFFERED: "1"
-      GROQ_API_KEY: ${GROQ_API_KEY}
-      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY}
     depends_on:
       - qdrant
 
@@ -53,8 +54,9 @@ services:
       - ./data/agent3:/app/data
     environment:
       PYTHONUNBUFFERED: "1"
-      GROQ_API_KEY: ${GROQ_API_KEY}
-      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY}
     depends_on:
       - qdrant
 

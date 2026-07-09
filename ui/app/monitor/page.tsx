@@ -73,14 +73,8 @@ export default function LabsPage() {
     if (agent === 'agent3') setA3Logs((p) => p.filter((e) => e.id !== id));
   }, []);
 
-  /* Provider selection (Groq / Ollama) for analyze calls */
-  const [provider, setProvider] = useState<'groq' | 'ollama'>(() => {
-    try { return (localStorage.getItem('test_provider') as 'groq' | 'ollama') ?? 'groq'; } catch { return 'groq'; }
-  });
-  const handleProviderChange = useCallback((p: 'groq' | 'ollama') => {
-    setProvider(p);
-    try { localStorage.setItem('test_provider', p); } catch { /* ignore */ }
-  }, []);
+  /* Provider selection is locked to Ollama Cloud */
+  const provider = 'ollama';
 
   /* Result modal */
   const [modal, setModal] = useState<ModalPayload | null>(null);
@@ -381,8 +375,6 @@ export default function LabsPage() {
               a2Logs={a2Logs}
               a3Logs={a3Logs}
               onDeleteEntry={handleDeleteEntry}
-              provider={provider}
-              onProviderChange={handleProviderChange}
               className="flex-1 min-h-0"
             />
           </div>

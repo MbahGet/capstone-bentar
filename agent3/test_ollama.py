@@ -6,7 +6,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="llama3.1:8b",
+    model="gpt-oss:120b",
     messages=[
         {
             "role": "system",

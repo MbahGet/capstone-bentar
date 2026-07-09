@@ -494,7 +494,7 @@ Part of Capstone Project — PT DearGod, 2024
 A: Tidak wajib, tapi GPU akan mempercepat SHAP calculation ~3-5x
 
 **Q: Bisa pakai LLM lain selain Ollama?**
-A: Ya, tinggal edit `llm_explain.py` untuk pakai OpenAI/Groq/Gemini
+A: Ya, tinggal edit `llm_explain.py` untuk pakai OpenAI/Gemini/Ollama Cloud
 
 **Q: Berapa lama analysis untuk 1000 rows?**
 A: ~2-5 menit tergantung hardware dan jumlah features

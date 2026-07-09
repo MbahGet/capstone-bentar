@@ -29,7 +29,7 @@ model_train_info = {}
 class QueryRequest(BaseModel):
     query: str
     sessionId: str | None = None
-    model_preference: str | None = "groq"
+    model_preference: str | None = "ollama"
 
 
 def ensure_model_trained() -> None:
@@ -189,7 +189,7 @@ def generate_report_summary(payload: dict):
     Endpoint khusus untuk Agent 1 (n8n).
     Hanya mengembalikan ringkasan pendek dan token placeholder agar tidak merusak memory LangChain.
     """
-    model_preference = payload.get("model_preference", "groq")
+    model_preference = payload.get("model_preference", "ollama")
     if not TRAINING_DATA_PATH.exists():
         return {"summary": "Error: Data CSV tidak ditemukan.", "instruction": "Inform user data is missing."}
 

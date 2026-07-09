@@ -57,7 +57,9 @@ deploy:production:
         cd $DEPLOY_PATH &&
         echo '$CI_REGISTRY_PASSWORD' | docker login -u '$CI_REGISTRY_USER' --password-stdin '$CI_REGISTRY' &&
         export REGISTRY_IMAGE='$CI_REGISTRY_IMAGE' &&
-        export GROQ_API_KEY='$GROQ_API_KEY' &&
+        export OLLAMA_BASE_URL='$OLLAMA_BASE_URL' &&
+        export OLLAMA_MODEL='$OLLAMA_MODEL' &&
+        export OLLAMA_API_KEY='$OLLAMA_API_KEY' &&
         docker compose pull &&
         docker compose up -d --remove-orphans &&
         docker image prune -f

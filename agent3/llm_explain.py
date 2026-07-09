@@ -9,12 +9,7 @@ try:
 except ImportError:
     HAS_DOTENV = False
 
-# Try importing groq with fallback to handle ModuleNotFoundError gracefully
-try:
-    from groq import Groq
-    HAS_GROQ = True
-except ImportError:
-    HAS_GROQ = False
+# dotenv helper
 
 
 def resolve_path(given_path, filename="shap_ranking.json"):
@@ -89,11 +84,6 @@ def check_health():
         "paths": {}
     }
     
-    # 1. Check dependencies
-    status["dependencies"]["groq"] = "installed" if HAS_GROQ else "missing"
-    if not HAS_GROQ:
-        status["status"] = "degraded"
-        
     try:
         import dotenv
         status["dependencies"]["dotenv"] = "installed"
@@ -102,15 +92,14 @@ def check_health():
         status["status"] = "degraded"
         
     # 2. Check environment variables
-    groq_key = os.environ.get("GROQ_API_KEY", "")
-    if groq_key:
-        masked_key = groq_key[:6] + "..." + groq_key[-4:] if len(groq_key) > 10 else "***"
-        status["environment"]["GROQ_API_KEY"] = f"configured ({masked_key})"
+    ollama_base = os.environ.get("OLLAMA_BASE_URL", "")
+    if ollama_base:
+        status["environment"]["OLLAMA_BASE_URL"] = ollama_base
     else:
-        status["environment"]["GROQ_API_KEY"] = "not_set"
+        status["environment"]["OLLAMA_BASE_URL"] = "not_set"
         status["status"] = "degraded"
         
-    status["environment"]["GROQ_MODEL"] = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    status["environment"]["OLLAMA_MODEL"] = os.environ.get("OLLAMA_MODEL", "gpt-oss:120b")
     
     # 3. Check paths
     cwd = Path.cwd()
@@ -129,33 +118,22 @@ def check_health():
 
 class LLMExplainer:
     """
-    Generate narasi fishbone RCA menggunakan Groq LLM (OpenAI-compatible API).
+    Generate narasi fishbone RCA menggunakan Ollama Cloud.
     Input: SHAP ranking dari SHAP analysis
     Output: Narasi yang bisa dibaca manusia + rekomendasi tindakan
     """
 
     def __init__(self, shap_ranking_path, model=None):
         self.shap_ranking_path = shap_ranking_path
-        self.model = model or os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
         self.shap_ranking = None
         self.explanation = None
+        self.force_ollama = True
 
         self.ollama_base_url = os.environ.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
-        self.ollama_model = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
+        self.ollama_model = os.environ.get("OLLAMA_MODEL", "gpt-oss:120b")
+        self.ollama_api_key = os.environ.get("OLLAMA_API_KEY", "ollama").strip("\"'")
 
-        groq_api_key = os.environ.get("GROQ_API_KEY", "")
-        if not groq_api_key:
-            print("[LLM] WARNING: GROQ_API_KEY not set — LLM explanation will use fallback text.")
-
-        if HAS_GROQ:
-            try:
-                self.client = Groq(api_key=groq_api_key or "placeholder")
-            except Exception as e:
-                print(f"[LLM] Error initializing Groq client: {e}")
-                self.client = None
-        else:
-            print("[LLM] WARNING: Groq SDK not available. Falling back to rule-based explanation.")
-            self.client = None
+        self.model = model or self.ollama_model
 
         print(f"[LLM] Initialized with model: {self.model}")
 
@@ -233,11 +211,11 @@ Berdasarkan ranking ini, lakukan hal berikut:
 Gunakan format laporan industri yang profesional dan actionable."""
 
     def _fallback_explanation(self) -> str:
-        """Fallback jika Groq tidak tersedia."""
+        """Fallback jika Ollama Cloud tidak tersedia."""
         causes = [item.get("feature", "unknown") for item in self.shap_ranking[:5]]
         lines = [
             "ROOT CAUSE ANALYSIS — FALLBACK REPORT",
-            "(Groq API tidak tersedia — analisis otomatis berdasarkan SHAP ranking)",
+            "(Ollama Cloud tidak tersedia — analisis otomatis berdasarkan SHAP ranking)",
             "",
             "PENYEBAB UTAMA (berdasarkan SHAP importance):",
         ]
@@ -254,48 +232,15 @@ Gunakan format laporan industri yang profesional dan actionable."""
         return "\n".join(lines)
 
     def generate_explanation(self):
-        """Call Groq LLM untuk generate narasi RCA."""
-        print(f"\n[LLM] Calling Groq ({self.model})...")
-
-        api_key = os.environ.get("GROQ_API_KEY", "")
-        if not api_key or not HAS_GROQ or not self.client:
-            print("[LLM] Groq client not fully configured/available — using fallback explanation.")
-            self.explanation = self._fallback_explanation()
-            return self.explanation
-
+        """Call Ollama Cloud (primary) untuk generate narasi RCA."""
         prompt = self.build_prompt()
-        print(f"[LLM] Prompt length: {len(prompt)} chars")
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "Kamu adalah ahli Root Cause Analysis (RCA) dan industrial operations "
-                            "di bidang manufaktur. Berikan analisis yang terstruktur, data-driven, "
-                            "dan actionable dalam bahasa Indonesia profesional."
-                        ),
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.3,
-                max_tokens=2048,
-            )
-            self.explanation = response.choices[0].message.content
-            print("✓ Explanation generated via Groq")
-            return self.explanation
-
-        except Exception as e:
-            print(f"[LLM] Groq error: {e} — falling back to Ollama or rule-based explanation.")
-
-        # --- Ollama (fallback 1) ---
+        # --- Ollama Cloud (Primary LLM Provider) ---
         if self.ollama_base_url:
-            print(f"\n[LLM] Calling Ollama ({self.ollama_model})...")
+            print(f"\n[LLM] Calling Ollama Cloud ({self.ollama_model})...")
+            url = f"{self.ollama_base_url}/api/chat"
             try:
                 import requests
-                url = f"{self.ollama_base_url}/api/chat"
                 payload_ollama = {
                     "model": self.ollama_model,
                     "messages": [
@@ -311,14 +256,25 @@ Gunakan format laporan industri yang profesional dan actionable."""
                     ],
                     "stream": False
                 }
-                resp = requests.post(url, json=payload_ollama, timeout=60)
+                headers = {}
+                if getattr(self, "ollama_api_key", None) and self.ollama_api_key != "ollama":
+                    headers["Authorization"] = f"Bearer {self.ollama_api_key}"
+                resp = requests.post(url, json=payload_ollama, headers=headers, timeout=60)
                 resp.raise_for_status()
                 self.explanation = resp.json()["message"]["content"]
-                print("✓ Explanation generated via Ollama")
+                print("✓ Explanation generated via Ollama Cloud")
                 return self.explanation
             except Exception as e:
-                print(f"[LLM] Ollama error: {e} — falling back to rule-based explanation.")
+                import traceback
+                print(f"[LLM] Ollama Cloud error: {e} — using rule-based fallback.")
+                try:
+                    with open("data/ollama_error.log", "w", encoding="utf-8") as f_err:
+                        traceback.print_exc(file=f_err)
+                        f_err.write(f"\nURL: {url}\nModel: {self.ollama_model}\nHeaders keys: {list(headers.keys())}\nKey prefix: {self.ollama_api_key[:6] if self.ollama_api_key else None}...\n")
+                except Exception as write_err:
+                    print(f"Failed to write error log: {write_err}")
 
+        # --- Rule-Based Fallback ---
         self.explanation = self._fallback_explanation()
         return self.explanation
 
@@ -348,7 +304,7 @@ Gunakan format laporan industri yang profesional dan actionable."""
                 f.write("=" * 60 + "\n\n")
                 f.write(self.explanation)
                 f.write("\n\n" + "=" * 60 + "\n")
-                f.write(f"Generated by: RCA Agent (SHAP + Groq {self.model})\n")
+                f.write(f"Generated by: RCA Agent (SHAP + Ollama Cloud {self.model})\n")
             print(f"✓ Explanation saved to {output_file}")
             return output_file
         except Exception as e:
@@ -372,7 +328,7 @@ Gunakan format laporan industri yang profesional dan actionable."""
             ranking_to_save = self.shap_ranking or []
             result = {
                 "analysis_type": "Root Cause Analysis (RCA)",
-                "method": f"SHAP-based ML + Groq LLM ({self.model})",
+                "method": f"SHAP-based ML + Ollama Cloud ({self.model})",
                 "top_root_causes": [
                     {
                         "rank": i + 1,

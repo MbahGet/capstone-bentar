@@ -5,11 +5,19 @@ export async function POST(req: NextRequest) {
   const url = process.env.AGENT1_URL ?? 'http://localhost:5678';
   try {
     const formData = await req.formData();
-    const res = await fetch(`${url}/webhook/upload`, {
+    let res = await fetch(`${url}/webhook/upload`, {
       method: 'POST',
       body: formData,
       signal: AbortSignal.timeout(60000),
     });
+
+    if (res.status === 404) {
+      res = await fetch(`${url}/webhook/upload-ollama`, {
+        method: 'POST',
+        body: formData,
+        signal: AbortSignal.timeout(60000),
+      });
+    }
     // n8n may respond with non-JSON on success — handle both
     const text = await res.text();
     let data: unknown;

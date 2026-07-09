@@ -10,7 +10,6 @@ interface Props {
 }
 
 const MODELS = [
-  { value: 'groq',   label: 'Groq' },
   { value: 'ollama', label: 'Ollama' },
 ];
 
@@ -23,7 +22,7 @@ function fileIcon(name: string) {
 
 export default function ChatInput({ onSend, disabled, placeholder = "Tanyakan sesuatu..." }: Props) {
   const [text, setText]   = useState('');
-  const [model, setModel] = useState('groq');
+  const [model, setModel] = useState('ollama');
   const [files, setFiles] = useState<File[]>([]);
 
   const textRef = useRef<HTMLTextAreaElement>(null);

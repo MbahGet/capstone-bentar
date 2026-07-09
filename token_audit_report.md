@@ -6,7 +6,7 @@ This document provides a comprehensive technical audit of the token usage pipeli
 
 ## 1. MODEL INFORMATION
 
-- **Current Model Name**: `gpt-oss-120b` (Configured across all agents via `.env` and `n8n_workflow.json`). *Note: This appears to be a custom or proxied open-source model endpoint mimicking Groq's API structure.*
+- **Current Model Name**: `gpt-oss-120b` (Configured across all agents via `.env` and `n8n_workflow.json`). *Note: This appears to be a custom or proxied open-source model endpoint using Ollama Cloud's API structure.*
 - **Context Window Size**: Estimated at **8,192 tokens** (Standard for LLaMa-3-based architectures).
 - **Max Output Tokens**: Up to **4,096 tokens** (As configured in `agent2/app/recommendation.py`).
 - **Reasoning Tokens Enabled**: **No**. Standard autoregressive generation is being used without advanced Chain-of-Thought reasoning token exposure (like OpenAI o1/o3).
@@ -61,7 +61,7 @@ Based on a static analysis of the workflow files and prompt lengths, here is the
 - **Semantic caching enabled?** **No**.
 - **Response caching enabled?** **No**.
 - **Embedding caching enabled?** **No**.
-- **Repeated prompts recomputed?** **Yes**. If a user asks "Kenapa defect tinggi?" twice, Agent 3 recalculates SHAP values, Groq regenerates the Fishbone narrative, and n8n processes the entire chain again.
+- **Repeated prompts recomputed?** **Yes**. If a user asks "Kenapa defect tinggi?" twice, Agent 3 recalculates SHAP values, Ollama Cloud regenerates the Fishbone narrative, and n8n processes the entire chain again.
 
 ---
 

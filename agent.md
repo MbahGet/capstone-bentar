@@ -6,11 +6,11 @@ Sistem ini terdiri dari **3 Agent AI** yang bekerja secara terintegrasi. Penggun
 
 ## Agent 1 — Orchestrator (Chatbot Utama)
 
-**Teknologi:** n8n + Groq LLM + Qdrant RAG  
+**Teknologi:** n8n + Ollama Cloud + Qdrant RAG  
 **Akses:** Chatbot di UI aplikasi  
 **Port:** `5678` (internal)
 
-Agent 1 adalah **pintu masuk tunggal** bagi pengguna. Ia membaca maksud pertanyaan, lalu memilih tool yang tepat: mencari SOP di Qdrant, memanggil Agent 2 untuk data KPI, atau Agent 2 untuk laporan Fishbone RCA.
+Agent 1 adalah **pintu masuk tunggal** bagi pengguna. Ia membaca maksud pertanyaan, lalu memilih tool yang tepat: mencari SOP di Qdrant, memanggil Agent 2 untuk data KPI, atau Agent 3 untuk laporan Fishbone RCA.
 
 ### Apa yang bisa ditanyakan ke Agent 1?
 
@@ -63,10 +63,10 @@ Gunakan saat ingin mengetahui penyebab mendalam dari defect produksi.
 | "Apa penyebab utama defect?" | Top-3 faktor penyebab dari SHAP ranking |
 | "Tampilkan analisis fishbone" | Diagram Fishbone (Man/Machine/Material/Method/Environment/Measurement) |
 | "Faktor apa yang paling mempengaruhi defect?" | Ranking fitur berdasarkan importance score |
-| "Rangkuman RCA" / "Rangkuman agent 3" | Narasi RCA lengkap dari Groq LLM |
+| "Rangkuman RCA" / "Rangkuman agent 3" | Narasi RCA lengkap dari Ollama Cloud |
 | "Apa rekomendasi RCA-nya?" | Daftar 3–5 rekomendasi tindakan prioritas |
 
-> **Cara kerja:** Agent 1 memanggil Agent 3 (`/report`), mengambil field `rca_report_text` dari respons (narasi Fishbone dari Groq), dan menyajikannya verbatim.
+> **Cara kerja:** Agent 1 memanggil Agent 3 (`/report`), mengambil field `rca_report_text` dari respons (narasi Fishbone dari Ollama Cloud), dan menyajikannya verbatim.
 
 ---
 
@@ -102,7 +102,7 @@ Setelah upload, dokumen akan:
 
 ## Agent 2 — Production Decision Support (KPI Analyst)
 
-**Teknologi:** FastAPI + XGBoost + Groq LLM  
+**Teknologi:** FastAPI + XGBoost + Ollama Cloud  
 **Port:** `8000`  
 **Endpoint utama:** `POST /query`, `POST /analyze`
 
@@ -116,7 +116,7 @@ Data CSV Produksi
   → evaluate_thresholds()     ← Deteksi pelanggaran ambang batas SOP
   → DeviationModel.predict()  ← XGBoost: prediksi probabilitas deviasi per mesin per tanggal
   → top_deviation_rows()      ← Ranking top-5 mesin paling berisiko
-  → generate_recommendation() ← Groq LLM: buat laporan taktis actionable
+  → generate_recommendation() ← Ollama Cloud: buat laporan taktis actionable
   → recommendation_report_text ← Field yang diteruskan ke chatbot
 ```
 
@@ -170,11 +170,11 @@ Kolom minimal yang dibutuhkan:
 
 ## Agent 3 — Root Cause Analysis (RCA Analyst)
 
-**Teknologi:** FastAPI + XGBoost + SHAP + Groq LLM  
+**Teknologi:** FastAPI + XGBoost + SHAP + Ollama Cloud  
 **Port:** `9000`  
 **Endpoint utama:** `POST /query`, `POST /analyze`
 
-Agent 3 bertugas melakukan **analisis mendalam penyebab defect** menggunakan kombinasi machine learning (SHAP) dan Large Language Model (Groq) untuk menghasilkan Laporan Fishbone (Ishikawa).
+Agent 3 bertugas melakukan **analisis mendalam penyebab defect** menggunakan kombinasi machine learning (SHAP) dan Large Language Model (Ollama Cloud) untuk menghasilkan Laporan Fishbone (Ishikawa).
 
 ### Pipeline Kerja Agent 3
 
@@ -183,7 +183,7 @@ Data CSV (Production + Defect + Downtime)
   → DataPreprocessor.preprocess()     ← Merge, bersihkan, feature engineering
   → CorrelationAnalyzer               ← Pearson, Spearman, Chi-Square correlation
   → SHAPAnalyzer                      ← Train XGBoost → hitung SHAP values → ranking fitur
-  → LLMExplainer.generate_explanation() ← Groq LLM: buat narasi Fishbone dari SHAP ranking
+  → LLMExplainer.generate_explanation() ← Ollama Cloud: buat narasi Fishbone dari SHAP ranking
   → rca_report_text                   ← Field yang diteruskan ke chatbot
 ```
 
@@ -193,7 +193,7 @@ Data CSV (Production + Defect + Downtime)
 |---|---|
 | `summary` | Total record, jumlah defect incident, defect rate % |
 | `root_causes` | Top-5 faktor penyebab dengan importance score |
-| `explanation` | Narasi RCA dari Groq LLM |
+| `explanation` | Narasi RCA dari Ollama Cloud |
 | **`rca_report_text`** | **String teks Laporan Fishbone lengkap — dipakai oleh chatbot** |
 | `feature_importance` | CSV lines dari SHAP feature importance |
 | `artifacts` | Nama file chart SHAP (bar, dot, heatmap) |
@@ -265,7 +265,7 @@ Agent 3 menerima **satu CSV terintegrasi** (format `integrated_production_log.cs
                   ▼
 ┌──────────────────────────────────────┐
 │         AGENT 1 — Orchestrator       │
-│  (n8n + Groq + Qdrant RAG)          │
+│  (n8n + Ollama Cloud + Qdrant RAG)   │
 │                                      │
 │  Kondisi A → Cari di Qdrant (SOP)   │
 │  Kondisi B → Panggil Agent 2        │
@@ -279,7 +279,7 @@ Agent 3 menerima **satu CSV terintegrasi** (format `integrated_production_log.cs
 │ KPI Analyst  │   │  RCA Analyst     │
 │              │   │                  │
 │ XGBoost +    │   │ SHAP + XGBoost + │
-│ Groq LLM     │   │ Groq LLM         │
+│ Ollama Cloud │   │ Ollama Cloud     │
 │              │   │                  │
 │ → KPI report │   │ → Fishbone report│
 │ → Deviasi    │   │ → Root causes    │

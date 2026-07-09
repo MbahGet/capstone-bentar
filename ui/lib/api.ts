@@ -10,7 +10,7 @@ function getSessionId(): string {
 
 export async function sendChat(
   message: string,
-  model: string = 'groq',
+  model: string = 'ollama',
   files?: File[],
 ): Promise<{
   response: string;
@@ -52,7 +52,7 @@ export async function uploadPDF(file: File): Promise<{ success: boolean; message
   return res.json();
 }
 
-export async function analyzeKPI(file: File, provider: string = 'groq'): Promise<KPIResult> {
+export async function analyzeKPI(file: File, provider: string = 'ollama'): Promise<KPIResult> {
   const fd = new FormData();
   fd.append('file', file);
   fd.append('model_preference', provider);
@@ -64,7 +64,7 @@ export async function analyzeKPI(file: File, provider: string = 'groq'): Promise
   return res.json();
 }
 
-export async function analyzeRCA(file: File, provider: string = 'groq'): Promise<RCAResult> {
+export async function analyzeRCA(file: File, provider: string = 'ollama'): Promise<RCAResult> {
   const fd = new FormData();
   fd.append('file', file);
   fd.append('model_preference', provider);

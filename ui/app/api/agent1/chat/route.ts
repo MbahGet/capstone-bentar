@@ -9,9 +9,9 @@ export async function POST(req: NextRequest) {
     const { message, sessionId, model } = body;
     const chatInput = message || body.chatInput;
 
-    const webhookPath = model === 'ollama' ? '/webhook/chat-ollama' : '/webhook/chat';
+    const webhookPath = '/webhook/chat-ollama';
 
-    const res = await fetch(`${url}${webhookPath}`, {
+    let res = await fetch(`${url}${webhookPath}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chatInput, sessionId }),
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         const res2 = await fetch(`${agent2Url}/report_full`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: chatInput, model_preference: model }),
+          body: JSON.stringify({ query: chatInput, model_preference: 'ollama' }),
         });
         if (res2.ok) {
           responseText = responseText.replace('[INJECT_REPORT_2]', await res2.text());
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         const res3 = await fetch(`${agent3Url}/report_full`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: chatInput, model_preference: model }),
+          body: JSON.stringify({ query: chatInput, model_preference: 'ollama' }),
         });
         if (res3.ok) {
           responseText = responseText.replace('[INJECT_REPORT_3]', await res3.text());

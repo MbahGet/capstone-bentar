@@ -205,28 +205,7 @@ function CompactRow({
 }
 
 /* ─── Provider toggle ────────────────────────────────────────────────────── */
-type Provider = 'groq' | 'ollama';
-function ProviderToggle({ value, onChange }: { value: Provider; onChange: (v: Provider) => void }) {
-  return (
-    <div className="flex items-center gap-0.5 bg-[#0a0e1a] border border-[#1e2d4a] rounded-lg p-0.5 shrink-0">
-      {(['groq', 'ollama'] as Provider[]).map((p) => (
-        <button
-          key={p}
-          onClick={() => onChange(p)}
-          className={`px-2.5 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wide transition-all ${
-            value === p
-              ? p === 'groq'
-                ? 'bg-violet-600 text-white shadow-sm'
-                : 'bg-emerald-700 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-300'
-          }`}
-        >
-          {p}
-        </button>
-      ))}
-    </div>
-  );
-}
+
 
 /* ─── Tab config ─────────────────────────────────────────────────────────── */
 const TABS = [
@@ -241,15 +220,12 @@ interface Props {
   a2Logs: AgentLogEntry[];
   a3Logs: AgentLogEntry[];
   onDeleteEntry: (agent: 'agent1' | 'agent2' | 'agent3', id: string) => void;
-  provider: Provider;
-  onProviderChange: (p: Provider) => void;
   className?: string;
 }
 
 export function TabbedAgentLogPanel({
   a1Logs, a2Logs, a3Logs,
   onDeleteEntry,
-  provider, onProviderChange,
   className = '',
 }: Props) {
   const [activeTab, setActiveTab]   = useState<'agent1' | 'agent2' | 'agent3'>('agent1');
@@ -294,8 +270,6 @@ export function TabbedAgentLogPanel({
             })}
           </div>
 
-          {/* Provider toggle — far right of tab bar */}
-          <ProviderToggle value={provider} onChange={onProviderChange} />
         </div>
 
         {/* ── Log rows ── */}

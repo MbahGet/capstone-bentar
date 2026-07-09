@@ -51,7 +51,7 @@ def _fallback_recommendation(payload: Dict[str, Any]) -> str:
     )
 
 
-def generate_recommendation(payload: Dict[str, Any], model_preference: str = "groq") -> Dict[str, Any]:
+def generate_recommendation(payload: Dict[str, Any], model_preference: str = "ollama") -> Dict[str, Any]:
     settings = get_settings()
 
     summary = payload.get("summary", {})
@@ -88,40 +88,11 @@ def generate_recommendation(payload: Dict[str, Any], model_preference: str = "gr
         "tingkat probabilitas deviasi tertinggi."
     )
 
-    # --- Groq (primary) ---
-    if settings.groq_api_key and model_preference != "ollama":
-        try:
-            from groq import Groq
-
-            client = Groq(api_key=settings.groq_api_key)
-            response = client.chat.completions.create(
-                model=settings.groq_model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "Kamu adalah AI Senior Industrial & Operations Engineer yang ahli "
-                            "dalam menganalisis anomali manufaktur dan Root Cause Analysis. "
-                            "Berikan instruksi operasional yang spesifik, berorientasi pada "
-                            "tindakan (actionable), dan langsung bisa dieksekusi oleh tim di lapangan. "
-                            "Gunakan bahasa Indonesia profesional dan struktur yang rapi (bullet points)."
-                        )
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.3,
-                max_tokens=4096,
-            )
-            text = response.choices[0].message.content
-            print(f"[Recommendation] Groq call OK ({settings.groq_model})")
-            return {"source": "groq", "model": settings.groq_model, "text": text}
-        except Exception as exc:
-            print(f"[Recommendation] Groq failed: {exc} — falling back to Ollama or rule-based")
-
+    # --- Ollama Cloud (Primary) ---
     if settings.ollama_base_url:
+        url = f"{settings.ollama_base_url}/api/chat"
         try:
             import requests
-            url = f"{settings.ollama_base_url}/api/chat"
             payload_ollama = {
                 "model": settings.ollama_model,
                 "messages": [
@@ -139,13 +110,24 @@ def generate_recommendation(payload: Dict[str, Any], model_preference: str = "gr
                 ],
                 "stream": False
             }
-            resp = requests.post(url, json=payload_ollama, timeout=60)
+            headers = {}
+            api_key = settings.ollama_api_key.strip("\"'")
+            if api_key and api_key != "ollama":
+                headers["Authorization"] = f"Bearer {api_key}"
+            resp = requests.post(url, json=payload_ollama, headers=headers, timeout=60)
             resp.raise_for_status()
             text = resp.json()["message"]["content"]
-            print(f"[Recommendation] Ollama call OK ({settings.ollama_model})")
+            print(f"[Recommendation] Ollama Cloud call OK ({settings.ollama_model})")
             return {"source": "ollama", "model": settings.ollama_model, "text": text}
         except Exception as exc:
-            print(f"[Recommendation] Ollama failed: {exc} — falling back to rule-based")
+            import traceback
+            print(f"[Recommendation] Ollama Cloud failed: {exc} — falling back to rule-based")
+            try:
+                with open("data/ollama_error.log", "w", encoding="utf-8") as f_err:
+                    traceback.print_exc(file=f_err)
+                    f_err.write(f"\nURL: {url}\nModel: {settings.ollama_model}\nHeaders keys: {list(headers.keys())}\nKey prefix: {api_key[:6] if api_key else None}...\n")
+            except Exception as write_err:
+                print(f"Failed to write error log: {write_err}")
 
     # --- Fallback: rule-based ---
     return {

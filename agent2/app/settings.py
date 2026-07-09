@@ -17,15 +17,10 @@ except IndexError:
     env_files = ".env"
 
 class Settings(BaseSettings):
-    # Groq Configuration (primary LLM provider)
-    groq_api_key: Optional[str] = None
-    groq_model: str = "llama-3.3-70b-versatile"
-    groq_base_url: str = "https://api.groq.com/openai/v1"
-
-    # Ollama Configuration (fallback jika Groq tidak dikonfigurasi)
+    # Ollama Cloud Configuration (Primary LLM provider)
     ollama_api_key: str = "ollama"
     ollama_base_url: str = "http://host.docker.internal:11434"
-    ollama_model: str = "llama3.1:8b"
+    ollama_model: str = "gpt-oss:120b"
 
     model_config = SettingsConfigDict(
         env_file=env_files,

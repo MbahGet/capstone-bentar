@@ -14,7 +14,7 @@
         80,
         864
       ],
-      "id": "e842e069-a454-427b-b75f-9998366ef1eb",
+      "id": "247c322c-a656-4e29-b2c6-adacd77a6a71",
       "name": "Webhook Chat",
       "webhookId": "ab2d4d21-1dc3-4423-bf78-c13ac442c9d6"
     },
@@ -98,7 +98,7 @@
         480,
         224
       ],
-      "id": "195f2836-ad89-4890-9678-c925743c729b",
+      "id": "6dab85a2-99e1-4edc-be2f-9909f45db8a6",
       "name": "Switch"
     },
     {
@@ -113,7 +113,7 @@
         720,
         64
       ],
-      "id": "0470f0f2-96fd-4e3b-9ec7-b48b237100e9",
+      "id": "4a1dc159-ca3c-4f2b-8aa1-783c10dd3964",
       "name": "Extract from PDF"
     },
     {
@@ -127,7 +127,7 @@
         720,
         240
       ],
-      "id": "d7e32cff-3379-4bd2-ad84-8f9356b60532",
+      "id": "429d5c45-884b-49de-b97b-b81fddc36dc6",
       "name": "Extract from CSV"
     },
     {
@@ -143,7 +143,7 @@
         720,
         416
       ],
-      "id": "9f9d7832-a1b9-4164-b5af-8bb8960840a1",
+      "id": "edab8738-64e5-407c-879e-806e7f73caae",
       "name": "Extract from txt/md/log"
     },
     {
@@ -158,7 +158,7 @@
         288,
         240
       ],
-      "id": "32faba36-a695-4ba8-9a12-b8dd3fc3a5b9",
+      "id": "61e61d94-cf63-424b-9814-11a03c5aad7d",
       "name": "Split Out"
     },
     {
@@ -171,13 +171,13 @@
         960,
         224
       ],
-      "id": "9bd9d6ae-5e20-4da5-bf62-29918bd85bb1",
+      "id": "135ac928-33f7-44e4-9e88-8aeddce07f10",
       "name": "Merge"
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "upload-ollama",
+        "path": "upload",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -187,7 +187,7 @@
         80,
         240
       ],
-      "id": "186541df-afe5-4575-b2ab-c4375b0defb2",
+      "id": "f1d385de-f7ed-404f-8efa-0a54a8c22e84",
       "name": "Webhook Upload",
       "webhookId": "50ad0e3e-c9a2-4f5a-ae97-0d3d3ce23ddf"
     },
@@ -205,7 +205,7 @@
         352,
         864
       ],
-      "id": "3db36cb0-20ad-4299-96e7-5ccf7176e653",
+      "id": "def76685-8e2d-45d2-893f-d94826680657",
       "name": "Agent 1"
     },
     {
@@ -233,7 +233,7 @@
         608,
         1184
       ],
-      "id": "d8e05f90-8ab0-4f9a-a855-c3f10239b33e",
+      "id": "3bb204af-7d0f-4833-b7ea-f5f6edb5771d",
       "name": "Call Agent 2 (Decision Support)"
     },
     {
@@ -261,7 +261,7 @@
         784,
         1184
       ],
-      "id": "06bc2ae5-b2a2-49af-8689-2d7725258672",
+      "id": "6f078cc3-e945-49a9-be04-f4c19400940f",
       "name": "Call Agent 3 (RCA)"
     },
     {
@@ -276,7 +276,7 @@
         928,
         864
       ],
-      "id": "790945ce-13ce-4bc4-967c-e44e3cebe8bb",
+      "id": "19182864-1233-4160-8704-ce6a06524ceb",
       "name": "Respond to Webhook"
     },
     {
@@ -290,7 +290,7 @@
         1424,
         240
       ],
-      "id": "a49f4390-2ec5-4d3e-aebf-7b9edd4547e3",
+      "id": "6fa88cb0-5dd1-479e-9fde-0a6a75b6fae9",
       "name": "Loop Over Items"
     },
     {
@@ -303,7 +303,7 @@
         1728,
         96
       ],
-      "id": "6f187488-1d32-4ad9-88f8-013509576740",
+      "id": "cd051d03-e23b-4014-9f57-18b3f6c73c50",
       "name": "Respond to Webhook Upload"
     },
     {
@@ -319,7 +319,7 @@
         0,
         0
       ],
-      "id": "98a156ef-4c20-4bec-a73d-e9f6b02793be",
+      "id": "63574f97-87c6-447f-83f5-371c43114c04",
       "name": "Sticky Note"
     },
     {
@@ -335,7 +335,7 @@
         0,
         736
       ],
-      "id": "9cf62838-423e-493e-815f-56ee898e288f",
+      "id": "1c684f03-2b6b-4996-ae7d-22ac6b72d149",
       "name": "Sticky Note1"
     },
     {
@@ -356,11 +356,11 @@
         1728,
         256
       ],
-      "id": "b6e103e6-6e3b-4982-a4fc-e7c45d52fbdb",
+      "id": "e9527141-90e3-40da-94ac-5b7079c8e208",
       "name": "Vector Store",
       "credentials": {
         "qdrantApi": {
-          "id": "BIyIfPrQB8WAgwLl",
+          "id": "YvGuqVit19XaIsNg",
           "name": "Qdrant account"
         }
       }
@@ -372,14 +372,14 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        1648,
+        1664,
         496
       ],
-      "id": "89c354cb-cbff-46ca-af56-e15f80fbedb4",
+      "id": "a79c1258-9b2a-4900-abfe-4fc8021b08cd",
       "name": "Document Embeddings",
       "credentials": {
         "ollamaApi": {
-          "id": "u2OPWhvDt2m4iarI",
+          "id": "urdFoDj3FTQuDnTq",
           "name": "Ollama account"
         }
       }
@@ -394,11 +394,11 @@
         160,
         1360
       ],
-      "id": "b4bc9524-77ad-4f4a-8dc3-ca1a222dbe90",
+      "id": "53d5558d-dcac-44a0-a8f7-c5009e9acce1",
       "name": "Query Embeddings",
       "credentials": {
         "ollamaApi": {
-          "id": "u2OPWhvDt2m4iarI",
+          "id": "urdFoDj3FTQuDnTq",
           "name": "Ollama account"
         }
       }
@@ -413,7 +413,7 @@
         720,
         864
       ],
-      "id": "574fe722-070b-4f8f-b04d-f871c3b183d9",
+      "id": "f48cc932-bcac-48ed-bffa-42dcac8711d4",
       "name": "Formatter"
     },
     {
@@ -426,7 +426,7 @@
         1184,
         240
       ],
-      "id": "d42e7cd1-b321-4495-809f-cbb22eb3f950",
+      "id": "4e35579b-b70d-4394-b721-95601f458257",
       "name": "Format Document"
     },
     {
@@ -450,11 +450,11 @@
         160,
         1184
       ],
-      "id": "b2fbcbc1-521a-4a4e-a250-0e4d6b92c131",
+      "id": "281a2410-1287-4477-8607-9f0286801649",
       "name": "Get Document",
       "credentials": {
         "qdrantApi": {
-          "id": "BIyIfPrQB8WAgwLl",
+          "id": "YvGuqVit19XaIsNg",
           "name": "Qdrant account"
         }
       }
@@ -470,7 +470,7 @@
         448,
         1184
       ],
-      "id": "c1ea6aaf-d331-4cd0-88e9-5f7a6d1e7888",
+      "id": "f70f4ccd-79e2-4a5b-91ae-ff6690e9da3d",
       "name": "Simple Memory"
     },
     {
@@ -485,30 +485,8 @@
         1856,
         496
       ],
-      "id": "3de0862b-d30b-4ef3-ac63-f6bb03cbd4b9",
+      "id": "1a2fd21f-63ec-4093-ad91-3096c627e875",
       "name": "Default Data Loader"
-    },
-    {
-      "parameters": {
-        "model": "openai/gpt-oss-120b",
-        "options": {
-          "temperature": 0.2
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-      "typeVersion": 1,
-      "position": [
-        176,
-        1024
-      ],
-      "id": "6a862533-0e14-48c5-907e-8f36d33b2e34",
-      "name": "Groq Chat Model",
-      "credentials": {
-        "groqApi": {
-          "id": "a92q40fGiijwflyD",
-          "name": "Groq account"
-        }
-      }
     },
     {
       "parameters": {
@@ -521,14 +499,14 @@
       "typeVersion": 1,
       "position": [
         176,
-        1200
+        1024
       ],
-      "id": "ollama-node-123",
+      "id": "f261fa75-c7b6-4968-995e-71ad6cc58724",
       "name": "Ollama Chat Model",
       "credentials": {
         "ollamaApi": {
-          "id": "ollama",
-          "name": "Ollama account"
+          "id": "xTqWXYNFBVXizh2E",
+          "name": "Ollama account 2"
         }
       }
     }
@@ -791,13 +769,14 @@
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "d1a811c1-b1d1-473c-9da0-bed8dede6890",
+  "versionId": "1f154291-cb6d-4fdf-9493-95a10875e6f2",
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "823e297856b31c26f7f9e01d7968f0f149726db759ccd89494403701d8949d6b"
+    "instanceId": "a88378ad78eda4cd819028ed513bc1d599910003b7fc612f40a4ee510b75f86c"
   },
-  "id": "hUpfSDG48bDJoSoe",
+  "nodeGroups": [],
+  "id": "yMy8kpVjjOAnYYml",
   "tags": []
 }
