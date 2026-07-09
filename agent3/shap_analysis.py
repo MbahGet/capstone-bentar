@@ -128,10 +128,13 @@ class SHAPAnalyzer:
         if self.shap_values is None:
             raise ValueError("SHAP values belum dihitung!")
         
-        # Handle binary classification (shap_values might be list)
+        # Handle binary classification (shap_values might be list or 3D array)
         if isinstance(self.shap_values, list):
             # Untuk binary classification, ambil SHAP values untuk class 1
             shap_vals = self.shap_values[1]
+        elif isinstance(self.shap_values, np.ndarray) and len(self.shap_values.shape) == 3:
+            # If shape is (num_samples, num_features, 2), extract class 1
+            shap_vals = self.shap_values[:, :, 1]
         else:
             shap_vals = self.shap_values
         
@@ -161,9 +164,11 @@ class SHAPAnalyzer:
         output_path = Path(output_dir)
         output_path.mkdir(exist_ok=True)
         
-        # Handle binary classification
+        # Handle binary classification (shap_values might be list or 3D array)
         if isinstance(self.shap_values, list):
             shap_vals = self.shap_values[1]
+        elif isinstance(self.shap_values, np.ndarray) and len(self.shap_values.shape) == 3:
+            shap_vals = self.shap_values[:, :, 1]
         else:
             shap_vals = self.shap_values
         

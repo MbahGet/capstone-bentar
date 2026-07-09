@@ -175,9 +175,10 @@ class LLMExplainer:
             return self.shap_ranking
 
     def build_prompt(self):
+        ranking = self.shap_ranking or []
         ranking_text = "\n".join(
             f"{i+1}. {item.get('feature', 'unknown')} (importance score: {item.get('mean_abs_shap', 0.0):.4f})"
-            for i, item in enumerate(self.shap_ranking[:10])
+            for i, item in enumerate(ranking[:10])
         )
 
         return f"""Kamu adalah seorang ahli Root Cause Analysis (RCA) di bidang manufaktur dan maintenance industri.

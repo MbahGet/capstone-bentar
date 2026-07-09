@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
         });
         if (res2.ok) {
           responseText = responseText.replace('[INJECT_REPORT_2]', await res2.text());
+        } else {
+          responseText = responseText.replace('[INJECT_REPORT_2]', 'Pesan sistem: Gagal mengambil laporan penuh dari Agent 2 (status non-200).');
         }
       } catch (err) {
         console.error('Failed to inject Agent 2 report', err);
@@ -54,6 +56,8 @@ export async function POST(req: NextRequest) {
         });
         if (res3.ok) {
           responseText = responseText.replace('[INJECT_REPORT_3]', await res3.text());
+        } else {
+          responseText = responseText.replace('[INJECT_REPORT_3]', 'Pesan sistem: Gagal mengambil laporan penuh dari Agent 3 (status non-200).');
         }
       } catch (err) {
         console.error('Failed to inject Agent 3 report', err);

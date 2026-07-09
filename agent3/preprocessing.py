@@ -37,11 +37,14 @@ class DataPreprocessor:
         """Parse timestamp ke format yang konsisten"""
         print("\nParsing timestamps...")
         
-        # Production log: format "1/1/2024 0:00"
-        self.df_prod['timestamp'] = pd.to_datetime(
-            self.df_prod['timestamp'], 
-            format='%m/%d/%Y %H:%M'
-        )
+        # Production log: format "1/1/2024 0:00" with fallback to generic format
+        try:
+            self.df_prod['timestamp'] = pd.to_datetime(
+                self.df_prod['timestamp'], 
+                format='%m/%d/%Y %H:%M'
+            )
+        except Exception:
+            self.df_prod['timestamp'] = pd.to_datetime(self.df_prod['timestamp'])
         
         # Defect data: format "2025-05-01 08:00:00"
         self.df_defect['Timestamp'] = pd.to_datetime(self.df_defect['Timestamp'])
