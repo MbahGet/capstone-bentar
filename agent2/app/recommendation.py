@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+import requests
+
 from settings import get_settings
 
 
@@ -92,7 +94,6 @@ def generate_recommendation(payload: Dict[str, Any], model_preference: str = "ol
     if settings.ollama_base_url:
         url = f"{settings.ollama_base_url}/api/chat"
         try:
-            import requests
             payload_ollama = {
                 "model": settings.ollama_model,
                 "messages": [

@@ -13,6 +13,7 @@ if str(APP_DIR) not in sys.path:
 
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import PlainTextResponse
 
 from kpi_engine import calculate_kpis, evaluate_thresholds, summarize_kpis
 from modeling import DeviationModel, top_deviation_rows
@@ -61,7 +62,6 @@ async def query_agent(request: QueryRequest):
         raise HTTPException(status_code=404, detail="Data CSV tidak ditemukan")
 
     try:
-        import sys
         if str(BASE_DIR) not in sys.path:
             sys.path.insert(0, str(BASE_DIR))
         from data_gateway import load_integrated_csv, generate_agent2_df
@@ -127,8 +127,6 @@ def _read_csv_upload(file: UploadFile, raw_bytes: bytes) -> pd.DataFrame:
     return df
 
 
-from fastapi.responses import PlainTextResponse
-
 @app.post("/report_full", response_class=PlainTextResponse)
 async def report_full_agent(request: QueryRequest) -> str:
     """
@@ -138,7 +136,6 @@ async def report_full_agent(request: QueryRequest) -> str:
         return "Error: Data CSV tidak ditemukan."
 
     try:
-        import sys
         if str(BASE_DIR) not in sys.path:
             sys.path.insert(0, str(BASE_DIR))
         from data_gateway import load_integrated_csv, generate_agent2_df
@@ -194,7 +191,6 @@ def generate_report_summary(payload: dict):
         return {"summary": "Error: Data CSV tidak ditemukan.", "instruction": "Inform user data is missing."}
 
     try:
-        import sys
         if str(BASE_DIR) not in sys.path:
             sys.path.insert(0, str(BASE_DIR))
         from data_gateway import load_integrated_csv, generate_agent2_df
@@ -235,7 +231,6 @@ async def analyze_production_csv(file: UploadFile = File(...)) -> AnalyzeRespons
     df = _read_csv_upload(file, await file.read())
 
     try:
-        import sys
         if str(BASE_DIR) not in sys.path:
             sys.path.insert(0, str(BASE_DIR))
         from data_gateway import generate_agent2_df

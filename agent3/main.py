@@ -1,12 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse
 from pathlib import Path
 import tempfile
 import shutil
 import json
 from typing import Optional
-import uvicorn
+import sys
 from pydantic import BaseModel
+import pandas as pd
+import uvicorn
 
 # Import custom modules
 from preprocessing import DataPreprocessor
@@ -95,8 +97,6 @@ async def query_rca(request: RCAQueryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RCA Query failed: {str(e)}") 
 
-
-from fastapi.responses import PlainTextResponse
 
 
 @app.post("/report_full", response_class=PlainTextResponse)
@@ -187,8 +187,6 @@ async def analyze_rca(file: UploadFile = File(...)):
         print(f"\n[RCA] Created temp dir: {temp_dir}")
         
         # --- Gunakan Data Gateway ---
-        import sys
-        import pandas as pd
         from io import StringIO
         root_dir = Path(__file__).resolve().parents[1]
         if str(root_dir) not in sys.path:

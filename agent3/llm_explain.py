@@ -2,15 +2,13 @@ import json
 import os
 import sys
 from pathlib import Path
+import requests
 # Try importing dotenv with fallback to handle ModuleNotFoundError gracefully
 try:
     from dotenv import load_dotenv
     HAS_DOTENV = True
 except ImportError:
     HAS_DOTENV = False
-
-# dotenv helper
-
 
 def resolve_path(given_path, filename="shap_ranking.json"):
     """
@@ -241,7 +239,6 @@ Gunakan format laporan industri yang profesional dan actionable."""
             print(f"\n[LLM] Calling Ollama Cloud ({self.ollama_model})...")
             url = f"{self.ollama_base_url}/api/chat"
             try:
-                import requests
                 payload_ollama = {
                     "model": self.ollama_model,
                     "messages": [
