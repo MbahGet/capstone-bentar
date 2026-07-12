@@ -18,6 +18,16 @@ export async function POST(req: NextRequest) {
         signal: AbortSignal.timeout(60000),
       });
     }
+
+    if (res.status === 404) {
+      return NextResponse.json(
+        {
+          error: 'Webhook upload tidak ditemukan (404)',
+          details: 'Pastikan workflow n8n sudah di-import dan di-aktifkan (Active) di panel n8n (http://localhost:5678).'
+        },
+        { status: 404 }
+      );
+    }
     // n8n may respond with non-JSON on success — handle both
     const text = await res.text();
     let data: unknown;
