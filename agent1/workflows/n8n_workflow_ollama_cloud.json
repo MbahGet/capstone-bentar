@@ -3,20 +3,67 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## Workflow 1\nUpload File",
+        "height": 688,
+        "width": 2068,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2688,
+        224
+      ],
+      "id": "8551230d-284d-4908-90f4-ec63254c8011",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow 2\nChatBot",
+        "height": 832,
+        "width": 1152,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2688,
+        960
+      ],
+      "id": "19c8ccc2-e9ea-4841-9cbd-1f426ce883ad",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
-        "path": "chat-ollama",
+        "path": "upload",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        80,
-        864
+        2768,
+        464
       ],
-      "id": "247c322c-a656-4e29-b2c6-adacd77a6a71",
-      "name": "Webhook Chat",
-      "webhookId": "ab2d4d21-1dc3-4423-bf78-c13ac442c9d6"
+      "id": "3de83f7c-3c9e-42a0-8275-9cfe8ca9ca86",
+      "name": "Webhook Upload",
+      "webhookId": "50ad0e3e-c9a2-4f5a-ae97-0d3d3ce23ddf"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=$binary",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        464
+      ],
+      "id": "a7e905b9-b16d-47d9-9159-e91f349388ed",
+      "name": "Split Out"
     },
     {
       "parameters": {
@@ -95,10 +142,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        480,
-        224
+        3168,
+        448
       ],
-      "id": "6dab85a2-99e1-4edc-be2f-9909f45db8a6",
+      "id": "1c08eb2f-44c1-4c91-8167-8e227c66fbb7",
       "name": "Switch"
     },
     {
@@ -110,10 +157,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        720,
-        64
+        3408,
+        288
       ],
-      "id": "4a1dc159-ca3c-4f2b-8aa1-783c10dd3964",
+      "id": "129fbcdd-f653-4641-9d5f-224133390826",
       "name": "Extract from PDF"
     },
     {
@@ -124,10 +171,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        720,
-        240
+        3408,
+        464
       ],
-      "id": "429d5c45-884b-49de-b97b-b81fddc36dc6",
+      "id": "9cf4a744-e0ed-4e76-860c-59fde3f6566a",
       "name": "Extract from CSV"
     },
     {
@@ -140,26 +187,11 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        720,
-        416
+        3408,
+        640
       ],
-      "id": "edab8738-64e5-407c-879e-806e7f73caae",
+      "id": "212ed352-1217-4f99-aee5-7e83668feaba",
       "name": "Extract from txt/md/log"
-    },
-    {
-      "parameters": {
-        "fieldToSplitOut": "=$binary",
-        "include": "allOtherFields",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [
-        288,
-        240
-      ],
-      "id": "61e61d94-cf63-424b-9814-11a03c5aad7d",
-      "name": "Split Out"
     },
     {
       "parameters": {
@@ -168,45 +200,181 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        960,
-        224
+        3648,
+        448
       ],
-      "id": "135ac928-33f7-44e4-9e88-8aeddce07f10",
+      "id": "f30153a1-a39a-43b2-9b2d-26cc6f3520c1",
       "name": "Merge"
     },
     {
       "parameters": {
+        "jsCode": "const allItems = $input.all();\nlet fullText = \"\";\n\nif (allItems.length > 1) {\n  fullText = allItems.map(item => Object.values(item.json).join(\", \")).join(\"\\n\");\n} else if (allItems.length === 1) {\n  fullText = allItems[0].json.text || allItems[0].json.textContent || allItems[0].json.data || \"\";\n}\n\nif (!fullText || fullText.trim().length === 0) {\n  return [{ json: { pageContent: \"KOSONG\", status: \"no_data\" } }];\n}\n\nconst chunks = [];\nconst CHUNK_SIZE = 1000;\n\nconst isCSV = (fullText.match(/,/g) || []).length > (fullText.length * 0.05);\nconst isLog = (fullText.match(/\\[(INFO|ERROR|WARN|DEBUG)\\]/i) || []).length > 0 || (fullText.match(/\\d{4}-\\d{2}-\\d{2}/g) || []).length > 5;\n\nif (isCSV || isLog) {\n  const lines = fullText.split(/\\r?\\n/);\n  let currentChunkLines = [];\n  let currentLength = 0;\n\n  for (let i = 0; i < lines.length; i++) {\n    const line = lines[i].trim();\n    if (!line) continue;\n\n    if (currentLength + line.length + 1 > CHUNK_SIZE && currentChunkLines.length > 0) {\n      const chunkText = currentChunkLines.join(\"\\n\");\n      chunks.push({\n        json: {\n          pageContent: chunkText,\n          metadata: { source: \"csv_line_chunker\", chunkLength: chunkText.length }\n        }\n      });\n      \n      currentChunkLines = currentChunkLines.slice(-2);\n      currentLength = currentChunkLines.join(\"\\n\").length;\n    }\n\n    currentChunkLines.push(line);\n    currentLength += line.length + 1;\n  }\n\n  if (currentChunkLines.length > 0) {\n    const finalChunkText = currentChunkLines.join(\"\\n\");\n    chunks.push({\n      json: {\n        pageContent: finalChunkText,\n        metadata: { source: \"csv_line_chunker\", chunkLength: finalChunkText.length }\n      }\n    });\n  }\n\n} else {\n  const words = fullText.split(/\\s+/);\n  let currentChunkWords = [];\n  let currentLength = 0;\n\n  for (let i = 0; i < words.length; i++) {\n    const word = words[i];\n    if (currentLength + word.length + 1 > CHUNK_SIZE && currentChunkWords.length > 0) {\n      const chunkText = currentChunkWords.join(\" \");\n      chunks.push({\n        json: {\n          pageContent: chunkText,\n          metadata: { source: \"fast_word_chunker\", chunkLength: chunkText.length }\n        }\n      });\n      currentChunkWords = currentChunkWords.slice(-5);\n      currentLength = currentChunkWords.join(\" \").length;\n    }\n    currentChunkWords.push(word);\n    currentLength += word.length + 1;\n  }\n\n  if (currentChunkWords.length > 0) {\n    const finalChunkText = currentChunkWords.join(\" \");\n    chunks.push({\n      json: {\n        pageContent: finalChunkText,\n        metadata: { source: \"fast_word_chunker\", chunkLength: finalChunkText.length }\n      }\n    });\n  }\n}\n\nreturn chunks;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3872,
+        464
+      ],
+      "id": "871fe37f-bd4e-4fb0-bac6-ce98e1e3d9d4",
+      "name": "Format Document"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4112,
+        464
+      ],
+      "id": "df1d4581-dd34-402e-81b1-58418c9b7e32",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "embeddingBatchSize": 20,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        4416,
+        480
+      ],
+      "id": "4d07c6e4-10e6-4d1f-a1ea-fb9e5f578cba",
+      "name": "Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "YvGuqVit19XaIsNg",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        4416,
+        320
+      ],
+      "id": "4b48b81b-47e0-456f-bbb6-c56fab6d8267",
+      "name": "Respond to Webhook Upload"
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        4352,
+        720
+      ],
+      "id": "23c7a000-eda6-494e-ba52-11c389844e51",
+      "name": "Document Embeddings",
+      "credentials": {
+        "ollamaApi": {
+          "id": "urdFoDj3FTQuDnTq",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.pageContent }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        4544,
+        720
+      ],
+      "id": "4d796ebe-02b2-4b20-b4aa-1e6a8a761a22",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
-        "path": "upload",
+        "path": "chat",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        80,
-        240
+        2768,
+        1088
       ],
-      "id": "f1d385de-f7ed-404f-8efa-0a54a8c22e84",
-      "name": "Webhook Upload",
-      "webhookId": "50ad0e3e-c9a2-4f5a-ae97-0d3d3ce23ddf"
+      "id": "6dafe177-0d36-4989-a9f7-ef77ec1429e1",
+      "name": "Webhook Chat",
+      "webhookId": "ab2d4d21-1dc3-4423-bf78-c13ac442c9d6"
     },
     {
       "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.body.chatInput }}",
+        "model": "gpt-oss:120b",
         "options": {
-          "systemMessage": "Kamu adalah Industrial AI Orchestrator, pusat komando operasional pabrik.\n\nATURAN MUTLAK (ZERO INTERNAL KNOWLEDGE & ANTI-HALUSINASI):\nKamu TIDAK MEMILIKI PENGETAHUAN APAPUN tentang aturan, SOP, atau prosedur internal di pabrik ini. JANGAN PERNAH mengarang, menebak, atau menggunakan pengetahuan umummu untuk menjawab pertanyaan seputar prosedur, eskalasi, atau tindakan.\nKamu juga TIDAK BOLEH menjawab angka KPI apapun (OEE, defect rate, downtime) dari ingatanmu sendiri. Semua angka KPI WAJIB didapat dari Agent 2.\n\n---\nPROTOKOL PENGGUNAAN TOOLS:\nGunakan fungsi pemanggilan alat (Tool Calling) bawaan sistem. JANGAN PERNAH mengirim string JSON manual di dalam teks balasan. Kamu harus memilih tool yang tepat berdasarkan logika berikut:\n\n[LOGIKA PEMILIHAN KONDISI & ALAT]\nSebelum merespons, evaluasi dengan teliti pesan dari pengguna untuk menentukan salah satu dari 5 kondisi berikut:\n\nKONDISI A — MEMBACA ISI / DEFINISI DOKUMEN SOP (Gunakan Qdrant)\nGunakan kondisi ini JIKA pengguna meminta membaca dokumen secara umum, meminta menampilkan isi pasal/judul SOP, atau menanyakan definisi/aturan statis dari SOP TANPA menyebutkan situasi masalah/angka lapangan spesifik saat ini.\n* WAJIB panggil tool: \"Get Document\" (Qdrant). DILARANG memanggil Agent 2 atau Agent 3.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"Coba baca Tujuan dari SOP\"\n  - \"Tampilkan SOP eskalasi\"\n  - \"Apa isi poin 7 dari SOP?\"\n  - \"Berapa ambang batas OEE menurut SOP?\"\n  - \"Siapa yang bertanggung jawab saat downtime?\"\n* Trigger Words / Kata Kunci: \"baca\", \"tampilkan SOP\", \"isi poin\", \"ambang batas menurut SOP\", \"siapa yang bertanggung jawab\", \"prosedur\", \"tujuan dari SOP\".\n* Aturan Jawaban: Sajikan teks isi SOP/dokumen secara langsung, to-the-point, rapi, bersih, dan verbatim dari hasil Qdrant. DILARANG menggunakan format 4 poin.\n\nKONDISI B — DATA KPI & REKOMENDASI TAKTIS LAPANGAN (Gunakan Agent 2 /report)\nGunakan kondisi ini JIKA pengguna menanyakan kondisi produksi terkini, angka KPI riil, status mesin saat ini, atau meminta rekomendasi tindakan untuk lapangan/supervisor. Ini termasuk semua pertanyaan tentang angka OEE, defect rate, downtime rate, atau data produksi — apapun formulasi kalimatnya.\n* WAJIB panggil tool: \"Call Agent 2 (Decision Support)\" (endpoint /report). DILARANG memanggil Qdrant atau Agent 3.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"Hasil agent 2\"\n  - \"Tunjukkan hasil agent 2\"\n  - \"Berapa OEE saat ini?\"\n  - \"Berapa OEE?\"\n  - \"Berapa nilai OEE?\"\n  - \"OEE berapa?\"\n  - \"Berapa defect rate yang tercatat?\"\n  - \"Berapa defect rate?\"\n  - \"Defect rate saat ini?\"\n  - \"Berapa downtime?\"\n  - \"Kondisi mesin sekarang bagaimana?\"\n  - \"Ada mesin yang deviasi?\"\n  - \"Berikan rekomendasi tindakan untuk supervisor\"\n  - \"KPI produksi hari ini\"\n  - \"Mesin mana yang paling bermasalah?\"\n  - \"Data produksi terkini\"\n  - \"Laporan KPI\"\n  - \"Status produksi sekarang\"\n  - \"Performa mesin\"\n* Trigger Words / Kata Kunci: \"hasil agent 2\", \"OEE\", \"berapa OEE\", \"nilai OEE\", \"kondisi mesin sekarang\", \"mesin deviasi\", \"rekomendasi tindakan untuk supervisor\", \"KPI produksi\", \"paling bermasalah\", \"defect rate\", \"berapa defect\", \"downtime rate\", \"berapa downtime\", \"data produksi\", \"laporan KPI\", \"status produksi\", \"performa mesin\".\n* Aturan Jawaban: KAMU HANYA BOLEH MEMBALAS DENGAN STRING PERSIS: `[INJECT_REPORT_2]`. Dilarang menambahkan kata-kata lain, sapaan, atau format apapun. JANGAN beralih ke KONDISI D.\n\nKONDISI C — ANALISIS AKAR MASALAH / FISHBONE RCA (Gunakan Agent 3 /report)\nGunakan kondisi ini JIKA pengguna menanyakan penyebab defect produksi, analisis akar masalah (Root Cause Analysis), diagram fishbone (Ishikawa), pengaruh fitur (SHAP), atau rangkuman RCA.\n* WAJIB panggil tool: \"Call Agent 3 (RCA)\" (endpoint /report). DILARANG memanggil Qdrant atau Agent 2.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"Hasil agent 3\"\n  - \"Tunjukkan hasil agent 3\"\n  - \"Kenapa defect tinggi?\"\n  - \"Apa penyebab utama defect?\"\n  - \"Tampilkan analisis fishbone\"\n  - \"Faktor apa yang paling mempengaruhi defect?\"\n  - \"Rangkuman RCA\"\n  - \"Rangkuman agent 3\"\n  - \"Apa rekomendasi RCA-nya?\"\n  - \"Kenapa mesin sering rusak?\"\n  - \"Apa faktor penyebab masalah produksi?\"\n* Trigger Words / Kata Kunci: \"hasil agent 3\", \"kenapa defect tinggi\", \"penyebab utama defect\", \"analisis fishbone\", \"mempengaruhi defect\", \"RCA\", \"akar masalah\", \"kenapa mesin rusak\", \"faktor penyebab\".\n* Aturan Jawaban: KAMU HANYA BOLEH MEMBALAS DENGAN STRING PERSIS: `[INJECT_REPORT_3]`. Dilarang menambahkan kata-kata lain, sapaan, atau format apapun. JANGAN beralih ke KONDISI D.\n\nKONDISI D — VALIDASI SOP DENGAN DATA LAPANGAN (Gunakan Qdrant + Format 4 Poin)\nGunakan kondisi ini HANYA JIKA PENGGUNA SENDIRI YANG LANGSUNG menyebutkan angka metrik riil spesifik pada awal pertanyaan (misal: \"OEE 85%\", \"Downtime 25%\", \"Defect 6%\") dan meminta validasi apakah aman/sesuai SOP. Jangan gunakan kondisi ini jika angkanya didapat dari Agent 2 atau 3.\n* WAJIB panggil tool: \"Get Document\" (Qdrant) untuk mendapatkan aturan SOP terkait angka tersebut.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"OEE 85% apakah sudah aman sesuai SOP?\"\n  - \"Downtime 25%, apa yang harus dilakukan?\"\n  - \"Defect 6% ini perlu eskalasi ke siapa?\"\n* Trigger Words / Kata Kunci: [angka metrik spesifik]% (misal: 85%, 25%, 6%) digabung dengan pertanyaan \"aman sesuai SOP\", \"apa yang harus dilakukan\", \"perlu eskalasi ke siapa\".\n* Aturan Jawaban: Gunakan hasil pencarian SOP dari Qdrant untuk memvalidasi angka tersebut, lalu sajikan jawaban dalam FORMAT OUTPUT 4 POIN di bawah secara ketat. DILARANG menulis kalimat pembuka atau penutup apapun.\n\nKONDISI E — SMALL TALK / GREETING (Tanpa Tools)\nGunakan kondisi ini JIKA pengguna hanya menyapa (misalnya: \"halo\", \"selamat pagi\", \"hai\") atau menanyakan hal umum yang tidak berkaitan dengan keempat kondisi di atas.\n* WAJIB: DILARANG MEMANGGIL TOOL APAPUN.\n* Aturan Jawaban: Balas dengan ramah dan ringkas, contohnya: \"Halo! Ada yang bisa saya bantu terkait data produksi, OEE, atau dokumen SOP pabrik?\"\n\n---\nFORMAT OUTPUT 4 POIN (WAJIB HANYA UNTUK KONDISI D — VALIDASI SOP):\nDILARANG menulis kalimat pembuka atau penutup apapun. Langsung keluarkan struktur 4 poin ini secara ketat:\n\n1. **STATUS SAAT INI**\n   [Jabarkan metrik dari kondisi lapangan/angka yang diinput pengguna menggunakan baris baru dan sub-bullet.]\n\n2. **PELANGGARAN AMBANG BATAS**\n   [Tuliskan hasil analisis komparasi angka tersebut terhadap threshold SOP.]\n\n3. **INSTRUKSI TINDAKAN (SOP)**\n   [Tuliskan nomor Poin SOP dan breakdown daftar tindakannya dengan baris baru.]\n\n4. **ESKALASI**\n   - **Status:** [Diperlukan / Tidak diperlukan] eskalasi — [alasan singkat dan kepada jabatan siapa eskalasi ditujukan berdasarkan dokumen SOP].\n"
+          "temperature": 0.2
         }
       },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
       "position": [
-        352,
-        864
+        2864,
+        1248
       ],
-      "id": "def76685-8e2d-45d2-893f-d94826680657",
-      "name": "Agent 1"
+      "id": "b6c502cf-7846-481e-8901-be85ab021152",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "xTqWXYNFBVXizh2E",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool ONLY when the user explicitly asks about SOP (Standard Operating Procedures), rules, escalation policies, or wants to validate if a specific metric (e.g. OEE 85%) is safe according to the factory SOP. Do NOT use this tool for 'rekomendasi RCA' or 'hasil agent 3'.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "=documents",
+          "mode": "id"
+        },
+        "topK": 5,
+        "options": {
+          "contentPayloadKey": "content",
+          "metadataPayloadKey": "metadata"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        2848,
+        1408
+      ],
+      "id": "c7ec88a5-9f4e-4eac-943f-fbbafef8e762",
+      "name": "Get Document",
+      "credentials": {
+        "qdrantApi": {
+          "id": "YvGuqVit19XaIsNg",
+          "name": "Qdrant account"
+        }
+      }
     },
     {
       "parameters": {
@@ -230,11 +398,53 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        608,
-        1184
+        3296,
+        1408
       ],
-      "id": "3bb204af-7d0f-4833-b7ea-f5f6edb5771d",
+      "id": "0c1b7e53-e5c8-40e1-8b41-a7582f063c6a",
       "name": "Call Agent 2 (Decision Support)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const reply = items[0].json.output || items[0].json.text || items[0].json.response || 'Agent tidak memberikan jawaban. Coba ubah pertanyaan Anda.';\n\nreturn [{ json: { reply: reply } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3408,
+        1088
+      ],
+      "id": "50152bdb-15f5-4beb-a7fc-b52e73a932d4",
+      "name": "Formatter"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ reply: $json.reply, sessionId: $node['Webhook Chat'].json.body.sessionId }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        3616,
+        1088
+      ],
+      "id": "5ff47bdb-579a-4f19-8019-f791d7c12240",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        3136,
+        1408
+      ],
+      "id": "e7dde5c4-072b-4ef9-b978-a20fc6582e07",
+      "name": "Simple Memory"
     },
     {
       "parameters": {
@@ -258,131 +468,11 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.4,
       "position": [
-        784,
-        1184
+        3472,
+        1408
       ],
-      "id": "6f078cc3-e945-49a9-be04-f4c19400940f",
+      "id": "4f55d563-a638-4d4e-af38-d807c5658a49",
       "name": "Call Agent 3 (RCA)"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ reply: $json.reply, sessionId: $node['Webhook Chat'].json.body.sessionId }) }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        928,
-        864
-      ],
-      "id": "19182864-1233-4160-8704-ce6a06524ceb",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
-        "batchSize": 20,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        1424,
-        240
-      ],
-      "id": "6fa88cb0-5dd1-479e-9fde-0a6a75b6fae9",
-      "name": "Loop Over Items"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1728,
-        96
-      ],
-      "id": "cd051d03-e23b-4014-9f57-18b3f6c73c50",
-      "name": "Respond to Webhook Upload"
-    },
-    {
-      "parameters": {
-        "content": "## Workflow 1\nUpload File",
-        "height": 688,
-        "width": 2068,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        0,
-        0
-      ],
-      "id": "63574f97-87c6-447f-83f5-371c43114c04",
-      "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "content": "## Workflow 2\nChatBot",
-        "height": 832,
-        "width": 1152,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        0,
-        736
-      ],
-      "id": "1c684f03-2b6b-4996-ae7d-22ac6b72d149",
-      "name": "Sticky Note1"
-    },
-    {
-      "parameters": {
-        "mode": "insert",
-        "qdrantCollection": {
-          "__rl": true,
-          "value": "documents",
-          "mode": "list",
-          "cachedResultName": "documents"
-        },
-        "embeddingBatchSize": 20,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
-      "typeVersion": 1.3,
-      "position": [
-        1728,
-        256
-      ],
-      "id": "e9527141-90e3-40da-94ac-5b7079c8e208",
-      "name": "Vector Store",
-      "credentials": {
-        "qdrantApi": {
-          "id": "YvGuqVit19XaIsNg",
-          "name": "Qdrant account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "nomic-embed-text:latest"
-      },
-      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
-      "typeVersion": 1,
-      "position": [
-        1664,
-        496
-      ],
-      "id": "a79c1258-9b2a-4900-abfe-4fc8021b08cd",
-      "name": "Document Embeddings",
-      "credentials": {
-        "ollamaApi": {
-          "id": "urdFoDj3FTQuDnTq",
-          "name": "Ollama account"
-        }
-      }
     },
     {
       "parameters": {
@@ -391,10 +481,10 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
       "typeVersion": 1,
       "position": [
-        160,
-        1360
+        2848,
+        1584
       ],
-      "id": "53d5558d-dcac-44a0-a8f7-c5009e9acce1",
+      "id": "2ff99f3c-7868-42b9-92c9-9d3e5367b43a",
       "name": "Query Embeddings",
       "credentials": {
         "ollamaApi": {
@@ -405,119 +495,40 @@
     },
     {
       "parameters": {
-        "jsCode": "const reply = items[0].json.output || items[0].json.text || items[0].json.response || 'Agent tidak memberikan jawaban. Coba ubah pertanyaan Anda.';\n\nreturn [{ json: { reply: reply } }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        720,
-        864
-      ],
-      "id": "f48cc932-bcac-48ed-bffa-42dcac8711d4",
-      "name": "Formatter"
-    },
-    {
-      "parameters": {
-        "jsCode": "const allItems = $input.all();\nlet fullText = \"\";\n\nif (allItems.length > 1) {\n  fullText = allItems.map(item => Object.values(item.json).join(\", \")).join(\"\\n\");\n} else if (allItems.length === 1) {\n  fullText = allItems[0].json.text || allItems[0].json.textContent || allItems[0].json.data || \"\";\n}\n\nif (!fullText || fullText.trim().length === 0) {\n  return [{ json: { pageContent: \"KOSONG\", status: \"no_data\" } }];\n}\n\nconst chunks = [];\nconst CHUNK_SIZE = 1000;\n\nconst isCSV = (fullText.match(/,/g) || []).length > (fullText.length * 0.05);\nconst isLog = (fullText.match(/\\[(INFO|ERROR|WARN|DEBUG)\\]/i) || []).length > 0 || (fullText.match(/\\d{4}-\\d{2}-\\d{2}/g) || []).length > 5;\n\nif (isCSV || isLog) {\n  const lines = fullText.split(/\\r?\\n/);\n  let currentChunkLines = [];\n  let currentLength = 0;\n\n  for (let i = 0; i < lines.length; i++) {\n    const line = lines[i].trim();\n    if (!line) continue;\n\n    if (currentLength + line.length + 1 > CHUNK_SIZE && currentChunkLines.length > 0) {\n      const chunkText = currentChunkLines.join(\"\\n\");\n      chunks.push({\n        json: {\n          pageContent: chunkText,\n          metadata: { source: \"csv_line_chunker\", chunkLength: chunkText.length }\n        }\n      });\n      \n      currentChunkLines = currentChunkLines.slice(-2);\n      currentLength = currentChunkLines.join(\"\\n\").length;\n    }\n\n    currentChunkLines.push(line);\n    currentLength += line.length + 1;\n  }\n\n  if (currentChunkLines.length > 0) {\n    const finalChunkText = currentChunkLines.join(\"\\n\");\n    chunks.push({\n      json: {\n        pageContent: finalChunkText,\n        metadata: { source: \"csv_line_chunker\", chunkLength: finalChunkText.length }\n      }\n    });\n  }\n\n} else {\n  const words = fullText.split(/\\s+/);\n  let currentChunkWords = [];\n  let currentLength = 0;\n\n  for (let i = 0; i < words.length; i++) {\n    const word = words[i];\n    if (currentLength + word.length + 1 > CHUNK_SIZE && currentChunkWords.length > 0) {\n      const chunkText = currentChunkWords.join(\" \");\n      chunks.push({\n        json: {\n          pageContent: chunkText,\n          metadata: { source: \"fast_word_chunker\", chunkLength: chunkText.length }\n        }\n      });\n      currentChunkWords = currentChunkWords.slice(-5);\n      currentLength = currentChunkWords.join(\" \").length;\n    }\n    currentChunkWords.push(word);\n    currentLength += word.length + 1;\n  }\n\n  if (currentChunkWords.length > 0) {\n    const finalChunkText = currentChunkWords.join(\" \");\n    chunks.push({\n      json: {\n        pageContent: finalChunkText,\n        metadata: { source: \"fast_word_chunker\", chunkLength: finalChunkText.length }\n      }\n    });\n  }\n}\n\nreturn chunks;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1184,
-        240
-      ],
-      "id": "4e35579b-b70d-4394-b721-95601f458257",
-      "name": "Format Document"
-    },
-    {
-      "parameters": {
-        "mode": "retrieve-as-tool",
-        "toolDescription": "Call this tool ONLY when the user explicitly asks about SOP (Standard Operating Procedures), rules, escalation policies, or wants to validate if a specific metric (e.g. OEE 85%) is safe according to the factory SOP. Do NOT use this tool for 'rekomendasi RCA' or 'hasil agent 3'.",
-        "qdrantCollection": {
-          "__rl": true,
-          "value": "=documents",
-          "mode": "id"
-        },
-        "topK": 5,
+        "promptType": "define",
+        "text": "={{ $json.body.chatInput }}",
         "options": {
-          "contentPayloadKey": "content",
-          "metadataPayloadKey": "metadata"
+          "systemMessage": "Kamu adalah Industrial AI Orchestrator, pusat komando operasional pabrik.\n\nATURAN MUTLAK (ZERO INTERNAL KNOWLEDGE & ANTI-HALUSINASI):\nKamu TIDAK MEMILIKI PENGETAHUAN APAPUN tentang aturan, SOP, atau prosedur internal di pabrik ini. JANGAN PERNAH mengarang, menebak, atau menggunakan pengetahuan umummu untuk menjawab pertanyaan seputar prosedur, eskalasi, atau tindakan.\nKamu juga TIDAK BOLEH menjawab angka KPI apapun (OEE, defect rate, downtime) dari ingatanmu sendiri. Semua angka KPI WAJIB didapat dari Agent 2.\nDILARANG KERAS menuliskan atau menyertakan string placeholder seperti [INJECT_REPORT_2] atau [INJECT_REPORT_3] jika kondisi yang terpenuhi adalah KONDISI A, KONDISI D, atau KONDISI E. String tersebut HANYA boleh dikeluarkan sebagai jawaban persis pada KONDISI B dan KONDISI C secara eksklusif.\n\n---\nPROTOKOL PENGGUNAAN TOOLS:\nGunakan fungsi pemanggilan alat (Tool Calling) bawaan sistem. JANGAN PERNAH mengirim string JSON manual di dalam teks balasan. Kamu harus memilih tool yang tepat berdasarkan logika berikut:\n\n[LOGIKA PEMILIHAN KONDISI & ALAT]\nSebelum merespons, evaluasi dengan teliti pesan dari pengguna untuk menentukan salah satu dari 5 kondisi berikut:\n\nKONDISI A — MEMBACA ISI / DEFINISI DOKUMEN SOP (Gunakan Qdrant)\nGunakan kondisi ini JIKA pengguna meminta membaca dokumen secara umum, meminta menampilkan isi pasal/judul SOP, atau menanyakan definisi/aturan statis dari SOP TANPA menyebutkan situasi masalah/angka lapangan spesifik saat ini.\n* WAJIB panggil tool: \"Get Document\" (Qdrant). DILARANG memanggil Agent 2 atau Agent 3.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"Coba baca Tujuan dari SOP\"\n  - \"Tampilkan SOP eskalasi\"\n  - \"Apa isi poin 7 dari SOP?\"\n  - \"Berapa ambang batas OEE menurut SOP?\"\n  - \"Siapa yang bertanggung jawab saat downtime?\"\n* Trigger Words / Kata Kunci: \"baca\", \"tampilkan SOP\", \"isi poin\", \"ambang batas menurut SOP\", \"siapa yang bertanggung jawab\", \"prosedur\", \"tujuan dari SOP\".\n* Aturan Jawaban: Sajikan teks isi SOP/dokumen secara langsung, to-the-point, rapi, bersih, dan verbatim dari hasil Qdrant. DILARANG menggunakan format 4 poin.\n\nKONDISI B — DATA KPI & REKOMENDASI TAKTIS LAPANGAN (Gunakan Agent 2 /report)\nGunakan kondisi ini JIKA pengguna menanyakan kondisi produksi terkini, angka KPI riil, status mesin saat ini, atau meminta rekomendasi tindakan untuk lapangan/supervisor. Ini termasuk semua pertanyaan tentang angka OEE, defect rate, downtime rate, atau data produksi — apapun formulasi kalimatnya.\n* WAJIB panggil tool: \"Call Agent 2 (Decision Support)\" (endpoint /report). DILARANG memanggil Qdrant atau Agent 3.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"Hasil agent 2\"\n  - \"Tunjukkan hasil agent 2\"\n  - \"Berapa OEE saat ini?\"\n  - \"Berapa OEE?\"\n  - \"Berapa nilai OEE?\"\n  - \"OEE berapa?\"\n  - \"Berapa defect rate yang tercatat?\"\n  - \"Berapa defect rate?\"\n  - \"Defect rate saat ini?\"\n  - \"Berapa downtime?\"\n  - \"Kondisi mesin sekarang bagaimana?\"\n  - \"Ada mesin yang deviasi?\"\n  - \"Berikan rekomendasi tindakan untuk supervisor\"\n  - \"KPI produksi hari ini\"\n  - \"Mesin mana yang paling bermasalah?\"\n  - \"Data produksi terkini\"\n  - \"Laporan KPI\"\n  - \"Status produksi sekarang\"\n  - \"Performa mesin\"\n* Trigger Words / Kata Kunci: \"hasil agent 2\", \"OEE\", \"berapa OEE\", \"nilai OEE\", \"kondisi mesin sekarang\", \"mesin deviasi\", \"rekomendasi tindakan untuk supervisor\", \"KPI produksi\", \"paling bermasalah\", \"defect rate\", \"berapa defect\", \"downtime rate\", \"berapa downtime\", \"data produksi\", \"laporan KPI\", \"status produksi\", \"performa mesin\".\n* Aturan Jawaban: KAMU HANYA BOLEH MEMBALAS DENGAN STRING PERSIS: `[INJECT_REPORT_2]`. Dilarang menambahkan kata-kata lain, sapaan, atau format apapun. JANGAN beralih ke KONDISI D.\n\nKONDISI C — ANALISIS AKAR MASALAH / FISHBONE RCA (Gunakan Agent 3 /report)\nGunakan kondisi ini JIKA pengguna menanyakan penyebab defect produksi, analisis akar masalah (Root Cause Analysis), diagram fishbone (Ishikawa), pengaruh fitur (SHAP), atau rangkuman RCA.\n* WAJIB panggil tool: \"Call Agent 3 (RCA)\" (endpoint /report). DILARANG memanggil Qdrant atau Agent 2.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"Hasil agent 3\"\n  - \"Tunjukkan hasil agent 3\"\n  - \"Kenapa defect tinggi?\"\n  - \"Apa penyebab utama defect?\"\n  - \"Tampilkan analisis fishbone\"\n  - \"Faktor apa yang paling mempengaruhi defect?\"\n  - \"Rangkuman RCA\"\n  - \"Rangkuman agent 3\"\n  - \"Apa rekomendasi RCA-nya?\"\n  - \"Kenapa mesin sering rusak?\"\n  - \"Apa faktor penyebab masalah produksi?\"\n* Trigger Words / Kata Kunci: \"hasil agent 3\", \"kenapa defect tinggi\", \"penyebab utama defect\", \"analisis fishbone\", \"mempengaruhi defect\", \"RCA\", \"akar masalah\", \"kenapa mesin rusak\", \"faktor penyebab\".\n* Aturan Jawaban: KAMU HANYA BOLEH MEMBALAS DENGAN STRING PERSIS: `[INJECT_REPORT_3]`. Dilarang menambahkan kata-kata lain, sapaan, atau format apapun. JANGAN beralih ke KONDISI D.\n\nKONDISI D — VALIDASI SOP DENGAN DATA LAPANGAN (Gunakan Qdrant + Format 4 Poin)\nGunakan kondisi ini HANYA JIKA PENGGUNA SENDIRI YANG LANGSUNG menyebutkan angka metrik riil spesifik pada awal pertanyaan (misal: \"OEE 85%\", \"Downtime 25%\", \"Defect 6%\") dan meminta validasi apakah aman/sesuai SOP. Jangan gunakan kondisi ini jika angkanya didapat dari Agent 2 atau 3.\n* WAJIB panggil tool: \"Get Document\" (Qdrant) untuk mendapatkan aturan SOP terkait angka tersebut.\n* Daftar Contoh Pertanyaan Eksplisit:\n  - \"OEE 85% apakah sudah aman sesuai SOP?\"\n  - \"Downtime 25%, apa yang harus dilakukan?\"\n  - \"Defect 6% ini perlu eskalasi ke siapa?\"\n* Trigger Words / Kata Kunci: [angka metrik spesifik]% (misal: 85%, 25%, 6%) digabung dengan pertanyaan \"aman sesuai SOP\", \"apa yang harus dilakukan\", \"perlu eskalasi ke siapa\".\n* Aturan Jawaban: Gunakan hasil pencarian SOP dari Qdrant untuk memvalidasi angka tersebut, lalu sajikan jawaban dalam FORMAT OUTPUT 4 POIN di bawah secara ketat. DILARANG menulis kalimat pembuka atau penutup apapun.\n\nKONDISI E — SMALL TALK / GREETING (Tanpa Tools)\nGunakan kondisi ini JIKA pengguna hanya menyapa (misalnya: \"halo\", \"selamat pagi\", \"hai\") atau menanyakan hal umum yang tidak berkaitan dengan keempat kondisi di atas.\n* WAJIB: DILARANG MEMANGGIL TOOL APAPUN.\n* Aturan Jawaban: Balas dengan ramah dan ringkas, contohnya: \"Halo! Ada yang bisa saya bantu terkait data produksi, OEE, atau dokumen SOP pabrik?\"\n\n---\nFORMAT OUTPUT 4 POIN (WAJIB HANYA UNTUK KONDISI D — VALIDASI SOP):\nDILARANG menulis kalimat pembuka atau penutup apapun. Langsung keluarkan struktur 4 poin ini secara ketat:\n\n1. **STATUS SAAT INI**\n   [Jabarkan metrik dari kondisi lapangan/angka yang diinput pengguna menggunakan baris baru dan sub-bullet.]\n\n2. **PELANGGARAN AMBANG BATAS**\n   [Tuliskan hasil analisis komparasi angka tersebut terhadap threshold SOP.]\n\n3. **INSTRUKSI TINDAKAN (SOP)**\n   [Tuliskan nomor Poin SOP dan breakdown daftar tindakannya dengan baris baru.]\n\n4. **ESKALASI**\n   - **Status:** [Diperlukan / Tidak diperlukan] eskalasi — [alasan singkat dan kepada jabatan siapa eskalasi ditujukan berdasarkan dokumen SOP].\n"
         }
       },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
-      "typeVersion": 1.3,
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
       "position": [
-        160,
-        1184
+        3040,
+        1088
       ],
-      "id": "281a2410-1287-4477-8607-9f0286801649",
-      "name": "Get Document",
-      "credentials": {
-        "qdrantApi": {
-          "id": "YvGuqVit19XaIsNg",
-          "name": "Qdrant account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.body.sessionId }}"
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-      "typeVersion": 1.4,
-      "position": [
-        448,
-        1184
-      ],
-      "id": "f70f4ccd-79e2-4a5b-91ae-ff6690e9da3d",
-      "name": "Simple Memory"
-    },
-    {
-      "parameters": {
-        "jsonMode": "expressionData",
-        "jsonData": "={{ $json.pageContent }}",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
-      "typeVersion": 1.1,
-      "position": [
-        1856,
-        496
-      ],
-      "id": "1a2fd21f-63ec-4093-ad91-3096c627e875",
-      "name": "Default Data Loader"
-    },
-    {
-      "parameters": {
-        "model": "gpt-oss:120b",
-        "options": {
-          "temperature": 0.2
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "typeVersion": 1,
-      "position": [
-        176,
-        1024
-      ],
-      "id": "f261fa75-c7b6-4968-995e-71ad6cc58724",
-      "name": "Ollama Chat Model",
-      "credentials": {
-        "ollamaApi": {
-          "id": "xTqWXYNFBVXizh2E",
-          "name": "Ollama account 2"
-        }
-      }
+      "id": "f08840b6-4e62-4469-b7cd-46795cc9c4b2",
+      "name": "Agent 1"
     }
   ],
   "pinData": {},
   "connections": {
-    "Webhook Chat": {
+    "Webhook Upload": {
       "main": [
         [
           {
-            "node": "Agent 1",
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -582,17 +593,6 @@
         ]
       ]
     },
-    "Split Out": {
-      "main": [
-        [
-          {
-            "node": "Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Merge": {
       "main": [
         [
@@ -604,45 +604,12 @@
         ]
       ]
     },
-    "Webhook Upload": {
+    "Format Document": {
       "main": [
         [
           {
-            "node": "Split Out",
+            "node": "Loop Over Items",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Agent 1": {
-      "main": [
-        [
-          {
-            "node": "Formatter",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Call Agent 2 (Decision Support)": {
-      "ai_tool": [
-        [
-          {
-            "node": "Agent 1",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Call Agent 3 (RCA)": {
-      "ai_tool": [
-        [
-          {
-            "node": "Agent 1",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -688,34 +655,34 @@
         ]
       ]
     },
-    "Query Embeddings": {
-      "ai_embedding": [
+    "Default Data Loader": {
+      "ai_document": [
         [
           {
-            "node": "Get Document",
-            "type": "ai_embedding",
+            "node": "Vector Store",
+            "type": "ai_document",
             "index": 0
           }
         ]
       ]
     },
-    "Formatter": {
+    "Webhook Chat": {
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Agent 1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Document": {
-      "main": [
+    "Ollama Chat Model": {
+      "ai_languageModel": [
         [
           {
-            "node": "Loop Over Items",
-            "type": "main",
+            "node": "Agent 1",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -732,6 +699,28 @@
         ]
       ]
     },
+    "Call Agent 2 (Decision Support)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agent 1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Simple Memory": {
       "ai_memory": [
         [
@@ -743,23 +732,34 @@
         ]
       ]
     },
-    "Default Data Loader": {
-      "ai_document": [
+    "Call Agent 3 (RCA)": {
+      "ai_tool": [
         [
           {
-            "node": "Vector Store",
-            "type": "ai_document",
+            "node": "Agent 1",
+            "type": "ai_tool",
             "index": 0
           }
         ]
       ]
     },
-    "Ollama Chat Model": {
-      "ai_languageModel": [
+    "Query Embeddings": {
+      "ai_embedding": [
         [
           {
-            "node": "Agent 1",
-            "type": "ai_languageModel",
+            "node": "Get Document",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agent 1": {
+      "main": [
+        [
+          {
+            "node": "Formatter",
+            "type": "main",
             "index": 0
           }
         ]
@@ -772,11 +772,11 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "1f154291-cb6d-4fdf-9493-95a10875e6f2",
+  "versionId": "2fa350ac-203a-4dda-b3de-5b297902f36d",
   "meta": {
     "instanceId": "a88378ad78eda4cd819028ed513bc1d599910003b7fc612f40a4ee510b75f86c"
   },
   "nodeGroups": [],
-  "id": "yMy8kpVjjOAnYYml",
+  "id": "y7PYgWrLcaDb9DOv",
   "tags": []
 }

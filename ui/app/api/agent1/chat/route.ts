@@ -5,25 +5,50 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   const url = process.env.AGENT1_URL ?? 'http://localhost:5678';
   try {
-    const body = await req.json();
-    const { message, sessionId, model } = body;
-    const chatInput = message || body.chatInput;
+    const contentType = req.headers.get('content-type') || '';
+    let chatInput = '';
+    let sessionId = '';
+    let model = 'ollama';
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData();
+      chatInput = (formData.get('message') as string) || (formData.get('chatInput') as string) || '';
+      sessionId = (formData.get('sessionId') as string) || '';
+      model = (formData.get('model') as string) || 'ollama';
+
+      const files = formData.getAll('files');
+      const uploadData = new FormData();
+      let hasFiles = false;
+
+      for (const fileEntry of files) {
+        if (fileEntry instanceof File && fileEntry.size > 0) {
+          uploadData.append('file', fileEntry);
+          hasFiles = true;
+        }
+      }
+
+      if (hasFiles) {
+        let uploadRes = await fetch(`${url}/webhook/upload`, {
+          method: 'POST',
+          body: uploadData
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error(`Gagal mengunggah file ke n8n (status ${uploadRes.status})`);
+        }
+      }
+    } else {
+      const body = await req.json();
+      chatInput = body.message || body.chatInput || '';
+      sessionId = body.sessionId || '';
+      model = body.model || 'ollama';
+    }
 
     let res = await fetch(`${url}/webhook/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chatInput, sessionId }),
-      signal: AbortSignal.timeout(60000),
+      body: JSON.stringify({ chatInput, sessionId })
     });
-
-    if (res.status === 404) {
-      res = await fetch(`${url}/webhook/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatInput, sessionId }),
-        signal: AbortSignal.timeout(60000),
-      });
-    }
 
     if (res.status === 404) {
       return NextResponse.json(
@@ -90,6 +115,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(normalised, { status: res.ok ? 200 : res.status });
   } catch (e) {
+    console.error('Next.js API Chat Error:', e);
     return NextResponse.json(
       { error: 'Agent 1 tidak dapat dijangkau', details: String(e) },
       { status: 503 }

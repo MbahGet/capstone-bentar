@@ -8,14 +8,14 @@ export async function POST(req: NextRequest) {
     let res = await fetch(`${url}/webhook/upload`, {
       method: 'POST',
       body: formData,
-      signal: AbortSignal.timeout(60000),
+      signal: AbortSignal.timeout(300000),
     });
 
     if (res.status === 404) {
       res = await fetch(`${url}/webhook/upload-ollama`, {
         method: 'POST',
         body: formData,
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(300000),
       });
     }
 
@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
     try { data = JSON.parse(text); } catch { data = { success: true, raw: text }; }
     return NextResponse.json(data, { status: res.ok ? 200 : res.status });
   } catch (e) {
+    console.error('Next.js API Upload Error:', e);
     return NextResponse.json(
       { error: 'Upload gagal — Agent 1 tidak dapat dijangkau', details: String(e) },
       { status: 503 }
